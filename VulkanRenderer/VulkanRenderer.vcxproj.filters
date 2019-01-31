@@ -1,0 +1,215 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source">
+      <UniqueIdentifier>{f92fbcdc-ceb5-4aef-b2f3-dbc2518f3125}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Include">
+      <UniqueIdentifier>{6fa69925-1217-4989-b42d-aa37041cd67b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Platform">
+      <UniqueIdentifier>{94660e65-9414-485b-8619-35dc3e34987b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Platform\Windows">
+      <UniqueIdentifier>{0c7be303-7647-4493-84df-b7a3beec7b85}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Math">
+      <UniqueIdentifier>{8fe76204-0181-41ca-9bfb-1fe5f71cedd2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\RHI">
+      <UniqueIdentifier>{6d90d3cd-f4c4-4c18-8be0-547f356079d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\RHI\Vulkan">
+      <UniqueIdentifier>{8a7188c5-9f53-40fa-990a-cd70afd971c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Object">
+      <UniqueIdentifier>{f038bea0-f49b-4e4b-9509-e0ae6bf677d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Helper">
+      <UniqueIdentifier>{9fa1474f-89b8-4d79-bb1e-13a33e384539}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Component">
+      <UniqueIdentifier>{3afa603d-3a1f-455f-a965-f5c6aea15e52}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Source\Include\BaseInclude.h">
+      <Filter>Source\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Platform\GenericPlatform.h">
+      <Filter>Source\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Platform\Platform.h">
+      <Filter>Source\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Platform\Windows\Resource.h">
+      <Filter>Source\Platform\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Platform\Windows\WindowsPlatform.h">
+      <Filter>Source\Platform\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Platform\Windows\WindowsPlatformCompilerPreSetup.h">
+      <Filter>Source\Platform\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Math\MathBase.h">
+      <Filter>Source\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Math\MathGlobal.h">
+      <Filter>Source\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Math\Matrix4x4.h">
+      <Filter>Source\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Math\Vector2.h">
+      <Filter>Source\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Math\Vector3.h">
+      <Filter>Source\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Math\Vector4.h">
+      <Filter>Source\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanDevice.h">
+      <Filter>Source\RHI\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Object\Camera.h">
+      <Filter>Source\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanBase.h">
+      <Filter>Source\RHI\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanSwapChain.h">
+      <Filter>Source\RHI\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanRenderPass.h">
+      <Filter>Source\RHI\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Helper\AssetManager.h">
+      <Filter>Source\Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Component\StaticMesh.h">
+      <Filter>Source\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanBuffer.h">
+      <Filter>Source\RHI\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanCommand.h">
+      <Filter>Source\RHI\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanPipeline.h">
+      <Filter>Source\RHI\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanShaderModule.h">
+      <Filter>Source\RHI\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanBufferP.h">
+      <Filter>Source\RHI\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanBufferManager.h">
+      <Filter>Source\RHI\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Component\RawShader.h">
+      <Filter>Source\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Component\Material.h">
+      <Filter>Source\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanPipelineLayout.h">
+      <Filter>Source\RHI\Vulkan</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Source\Include\BaseInclude.cpp">
+      <Filter>Source\Include</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Math\MathGlobal.cpp">
+      <Filter>Source\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Math\Matrix4x4.cpp">
+      <Filter>Source\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Math\Vector2.cpp">
+      <Filter>Source\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Math\Vector3.cpp">
+      <Filter>Source\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Math\Vector4.cpp">
+      <Filter>Source\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanDevice.cpp">
+      <Filter>Source\RHI\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Object\Camera.cpp">
+      <Filter>Source\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanBase.cpp">
+      <Filter>Source\RHI\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanSwapChain.cpp">
+      <Filter>Source\RHI\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanRenderPass.cpp">
+      <Filter>Source\RHI\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Helper\AssetManager.cpp">
+      <Filter>Source\Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Component\StaticMesh.cpp">
+      <Filter>Source\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanBuffer.cpp">
+      <Filter>Source\RHI\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanCommand.cpp">
+      <Filter>Source\RHI\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanPipeline.cpp">
+      <Filter>Source\RHI\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanShaderModule.cpp">
+      <Filter>Source\RHI\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanBufferP.cpp">
+      <Filter>Source\RHI\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanBufferManager.cpp">
+      <Filter>Source\RHI\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Component\RawShader.cpp">
+      <Filter>Source\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Component\Material.cpp">
+      <Filter>Source\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanPipelineLayout.cpp">
+      <Filter>Source\RHI\Vulkan</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="VulkanRenderer.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="small.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="VulkanRenderer.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+</Project>

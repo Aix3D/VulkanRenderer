@@ -1,0 +1,7 @@
+﻿  VulkanDevice.cpp
+f:\vulkanrenderer\source\rhi\vulkanrhi\vulkandevice.cpp(259): warning C4267: '=': conversion from 'size_t' to 'uint32_t', possible loss of data
+f:\vulkanrenderer\source\rhi\vulkanrhi\vulkandevice.cpp(325): warning C4267: '=': conversion from 'size_t' to 'uint32_t', possible loss of data
+f:\vulkanrenderer\source\rhi\vulkanrhi\vulkandevice.cpp(895): warning C4244: '=': conversion from 'Core::uint32' to 'float', possible loss of data
+f:\vulkanrenderer\source\rhi\vulkanrhi\vulkandevice.cpp(896): warning C4244: '=': conversion from 'Core::uint32' to 'float', possible loss of data
+  VulkanRenderer.vcxproj -> F:\VulkanRenderer\\bin\x64\Debug\VulkanRenderer.exe
+  VulkanRenderer.vcxproj -> F:\VulkanRenderer\\bin\x64\Debug\VulkanRenderer.pdb (Full PDB)
