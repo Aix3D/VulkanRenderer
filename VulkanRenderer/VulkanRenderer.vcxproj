@@ -188,6 +188,7 @@
     <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanPipeline.h" />
     <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanRenderPass.h" />
     <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanSwapChain.h" />
+    <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanVertexInputState.h" />
     <ClInclude Include="Resource.h" />
   </ItemGroup>
   <ItemGroup>
@@ -213,6 +214,7 @@
     <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanPipeline.cpp" />
     <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanRenderPass.cpp" />
     <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanSwapChain.cpp" />
+    <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanVertexInputState.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>

@@ -88,6 +88,11 @@ namespace Core
 		return m_renderPass;
 	}
 
+	VkRenderPass VulkanRenderPass::GetHandle()
+	{
+		return m_renderPass;
+	}
+
 	VulkanRenderPass::~VulkanRenderPass()
 	{
 

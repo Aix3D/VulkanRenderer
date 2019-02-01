@@ -18,6 +18,7 @@
 #include <../RHI/VulkanRHI/VulkanDevice.h>
 #include "../Source/Helper/AssetManager.h"
 #include "../Source/RHI/VulkanRHI/VulkanCommand.h"
+#include "../Source/Component/RawShader.h"
 
 #define MAX_LOADSTRING 100
 
@@ -57,10 +58,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_VULKANRENDERER));
 
-	std::unique_ptr<Core::AssetManager> assetManager = std::make_unique<Core::AssetManager>();
+	std::shared_ptr<Core::AssetManager> assetManager = std::make_shared<Core::AssetManager>();
 	
+	std::shared_ptr<Core::RawShader> pVertexShader = assetManager->LoadRawShader("mesh.vert.spv");
+	std::shared_ptr<Core::RawShader> pFragmentShader = assetManager->LoadRawShader("mesh.frag.spv");
+
 	std::unique_ptr<Core::VulkanDevice> vulkanDevice = std::make_unique<Core::VulkanDevice>();
-	vulkanDevice->Initialize(hInstance, g_window);
+	vulkanDevice->Initialize(pVertexShader, pFragmentShader, hInstance, g_window);
 
 	assetManager->LoadFBX("voyager.dae");// "cube.fbx");
 	

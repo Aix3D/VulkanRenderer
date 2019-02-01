@@ -7,6 +7,6 @@ namespace Core
 	{
 	public:
 		std::unique_ptr<ANSICHAR *> pRawData;
-
+		size_t size;
 	};
 }

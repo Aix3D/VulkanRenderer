@@ -9,8 +9,13 @@ namespace Core
 	{
 	private:
 		ctd::vector<VkDescriptorSetLayoutBinding> m_layoutBindings;
+		VkDescriptorSetLayout m_descriptorSetLayout;
+		VkPipelineLayout m_pipelineLayout;
 
 	public:
 		void PushLayoutBinding(VkDescriptorType type, VkShaderStageFlags stageFlag, uint32 binding);
+		void Build(VkDevice device);
+		VkDescriptorSetLayout GetDescriptorSetLayoutHandle();
+		VkPipelineLayout GetPipelineLayoutHandle();
 	};
 }

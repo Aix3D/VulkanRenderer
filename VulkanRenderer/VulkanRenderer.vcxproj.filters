@@ -127,6 +127,9 @@
     <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanPipelineLayout.h">
       <Filter>Source\RHI\Vulkan</Filter>
     </ClInclude>
+    <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanVertexInputState.h">
+      <Filter>Source\RHI\Vulkan</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Source\Include\BaseInclude.cpp">
@@ -196,6 +199,9 @@
       <Filter>Source\Component</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanPipelineLayout.cpp">
+      <Filter>Source\RHI\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanVertexInputState.cpp">
       <Filter>Source\RHI\Vulkan</Filter>
     </ClCompile>
   </ItemGroup>

@@ -7,6 +7,10 @@
 #include "VulkanCommandBufferPool.h"
 #include "VulkanBufferManager.h"
 #include "VulkanBufferP.h"
+#include "VulkanVertexInputState.h"
+#include "VulkanPipelineLayout.h"
+#include "..\..\Component\RawShader.h"
+#include "VulkanPipeline.h"
 
 #include VECTOR_INCLUDE_PATH
 #include STRING_INCLUDE_PATH
@@ -89,12 +93,12 @@ namespace Core
 
 		ctd::vector<VkFramebuffer> m_frameBuffers;
 
-		VkDescriptorSetLayout m_descriptorSetLayout;
-		VkPipelineLayout m_pipelineLayout;
+		//VkDescriptorSetLayout m_descriptorSetLayout;
+		//VkPipelineLayout m_pipelineLayout;
 
-		std::vector<VkShaderModule> m_shaderModules;
+		//std::vector<VkShaderModule> m_shaderModules;
 
-		VkPipeline m_pipeline;
+		//VkPipeline m_pipeline;
 
 		VkDescriptorPool m_descriptorPool;
 		VkDescriptorSet m_descriptorSet;
@@ -107,6 +111,10 @@ namespace Core
 
 		std::unique_ptr<VulkanBufferManager> m_pBufferManager;
 		std::weak_ptr<VulkanBufferP> m_pUniformBuffer;
+
+		VulkanVertexInputState m_inputState;
+		VulkanPipelineLayout m_pipelineLayout;
+		VulkanPipeline m_pipeline;
 
 		///////////////////////////////////////////////////////////////////////////
 
@@ -129,18 +137,21 @@ namespace Core
 		Bool getSupportedDepthFormat(VkFormat *depthFormat);
 		uint32 getMemoryType(uint32 typeBits, VkMemoryPropertyFlags properties, VkBool32 *memTypeFound = nullptr);
 
-		void setupVertexDescriptions();
-		void setupDescriptorSetLayout();
-		void preparePipelines();
+		//void setupVertexDescriptions();
+		//void setupDescriptorSetLayout();
+		//void preparePipelines();
 		void setupDescriptorPool();
 		void setupDescriptorSet();
-		VkPipelineShaderStageCreateInfo loadShader(ANSICHAR * fileName, VkShaderStageFlagBits stage);
+		//VkPipelineShaderStageCreateInfo loadShader(ANSICHAR * fileName, VkShaderStageFlagBits stage);
 
 		void initializeLogicalDevice(void* platformHandle, void* platformWindow);
 
+		std::weak_ptr<RawShader> m_pVertexShaderData;
+		std::weak_ptr<RawShader> m_pFragmentShaderData;
+
 	public:
 		VulkanDevice();
-		ErrorCode Initialize(void* platformHandle, void* platformWindow);
+		ErrorCode Initialize(std::shared_ptr<RawShader> pVertexShader, std::shared_ptr<RawShader> pFragmentShader, void* platformHandle, void* platformWindow);
 		void Draw();
 		void CreateBuffer(VkBufferUsageFlags usageFlags, VkMemoryPropertyFlags memoryPropertyFlags, VkDeviceSize size, VkBuffer *buffer, VkDeviceMemory *memory, void *data /*= nullptr*/);
 		VkCommandBuffer CreateCommandBuffer(VkCommandBufferLevel level, bool begin);

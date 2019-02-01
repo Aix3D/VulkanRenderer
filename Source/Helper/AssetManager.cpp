@@ -81,7 +81,8 @@ namespace Core
 
 			shaderMap[shaderName] = std::make_shared<RawShader>();
 			shaderMap[shaderName]->pRawData = std::make_unique<ANSICHAR*>(shaderCode);
-		
+			shaderMap[shaderName]->size = size;
+
 			return shaderMap[shaderName];
 		}
 
