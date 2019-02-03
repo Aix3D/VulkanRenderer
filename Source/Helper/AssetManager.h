@@ -15,8 +15,8 @@ namespace Core
 	class AssetManager
 	{
 	private:
-		const ANSICHAR * fbxFullPath = "G:\\Scenes";// "G:\\Projects\\Template0\\Assets\\Scenes";
-		const ANSICHAR * shaderFullPath = "G:\\Scenes";
+		const ANSICHAR * fbxFullPath = "D:\\Scenes";// "G:\\Projects\\Template0\\Assets\\Scenes";
+		const ANSICHAR * shaderFullPath = "D:\\Scenes";
 
 		ctd::map<ctd::string, std::shared_ptr<StaticMesh>> staitcMeshMap;
 		ctd::map<ctd::string, std::shared_ptr<RawShader>> shaderMap;

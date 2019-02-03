@@ -1,14 +1,9 @@
 ﻿  main.cpp
-  VulkanRenderPass.cpp
-  VulkanPipeline.cpp
-f:\vulkanrenderer\source\rhi\vulkanrhi\vulkanpipeline.cpp(88): warning C4267: '=': conversion from 'size_t' to 'uint32_t', possible loss of data
-f:\vulkanrenderer\source\rhi\vulkanrhi\vulkanpipeline.cpp(110): warning C4267: '=': conversion from 'size_t' to 'uint32_t', possible loss of data
   VulkanDevice.cpp
-f:\vulkanrenderer\source\rhi\vulkanrhi\vulkandevice.cpp(917): warning C4244: '=': conversion from 'Core::uint32' to 'float', possible loss of data
-f:\vulkanrenderer\source\rhi\vulkanrhi\vulkandevice.cpp(918): warning C4244: '=': conversion from 'Core::uint32' to 'float', possible loss of data
+d:\vulkanrenderer\source\rhi\vulkanrhi\vulkandevice.cpp(695): warning C4244: “=”: 从“Core::uint32”转换到“float”，可能丢失数据
+d:\vulkanrenderer\source\rhi\vulkanrhi\vulkandevice.cpp(696): warning C4244: “=”: 从“Core::uint32”转换到“float”，可能丢失数据
   AssetManager.cpp
-f:\vulkanrenderer\source\helper\assetmanager.cpp(140): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
-  RawShader.cpp
-  Generating Code...
-  VulkanRenderer.vcxproj -> F:\VulkanRenderer\\bin\x64\Debug\VulkanRenderer.exe
-  VulkanRenderer.vcxproj -> F:\VulkanRenderer\\bin\x64\Debug\VulkanRenderer.pdb (Full PDB)
+d:\vulkanrenderer\source\helper\assetmanager.cpp(140): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+  正在生成代码...
+  VulkanRenderer.vcxproj -> D:\VulkanRenderer\\bin\x64\Debug\VulkanRenderer.exe
+  VulkanRenderer.vcxproj -> D:\VulkanRenderer\\bin\x64\Debug\VulkanRenderer.pdb (Full PDB)

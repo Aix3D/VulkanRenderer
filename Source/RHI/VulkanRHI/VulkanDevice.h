@@ -11,6 +11,7 @@
 #include "VulkanPipelineLayout.h"
 #include "..\..\Component\RawShader.h"
 #include "VulkanPipeline.h"
+#include "VulkanDescriptorSets.h"
 
 #include VECTOR_INCLUDE_PATH
 #include STRING_INCLUDE_PATH
@@ -89,7 +90,6 @@ namespace Core
 		VkImageView m_depthStencilView;
 
 		VulkanRenderPass m_renderPass;
-		VkPipelineCache m_pipelineCache;
 
 		ctd::vector<VkFramebuffer> m_frameBuffers;
 
@@ -100,8 +100,8 @@ namespace Core
 
 		//VkPipeline m_pipeline;
 
-		VkDescriptorPool m_descriptorPool;
-		VkDescriptorSet m_descriptorSet;
+		//VkDescriptorPool m_descriptorPool;
+		//VkDescriptorSet m_descriptorSet;
 
 		uint32_t m_currentBuffer = 0;
 
@@ -115,6 +115,7 @@ namespace Core
 		VulkanVertexInputState m_inputState;
 		VulkanPipelineLayout m_pipelineLayout;
 		VulkanPipeline m_pipeline;
+		VulkanDescriptorSets m_descriptorSets;
 
 		///////////////////////////////////////////////////////////////////////////
 
@@ -137,13 +138,9 @@ namespace Core
 		Bool getSupportedDepthFormat(VkFormat *depthFormat);
 		uint32 getMemoryType(uint32 typeBits, VkMemoryPropertyFlags properties, VkBool32 *memTypeFound = nullptr);
 
-		//void setupVertexDescriptions();
-		//void setupDescriptorSetLayout();
-		//void preparePipelines();
-		void setupDescriptorPool();
-		void setupDescriptorSet();
-		//VkPipelineShaderStageCreateInfo loadShader(ANSICHAR * fileName, VkShaderStageFlagBits stage);
-
+		//void setupDescriptorPool();
+		//void setupDescriptorSet();
+		
 		void initializeLogicalDevice(void* platformHandle, void* platformWindow);
 
 		std::weak_ptr<RawShader> m_pVertexShaderData;
