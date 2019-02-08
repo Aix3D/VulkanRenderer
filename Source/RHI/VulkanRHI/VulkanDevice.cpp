@@ -13,6 +13,7 @@
 
 #include <fstream>
 #include <io.h>
+#include "VulkanGlobal.h"
 
 #include ARRAY_INCLUDE_PATH
 
@@ -190,56 +191,6 @@ namespace Core
 		}
 	}
 
-	//void VulkanDevice::setupDescriptorPool()
-	//{
-	//	VkDescriptorPoolSize uniformBufferDescriptorPoolSize{};
-	//	uniformBufferDescriptorPoolSize.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	//	uniformBufferDescriptorPoolSize.descriptorCount = 1;
-
-	//	vector<VkDescriptorPoolSize> poolSizes =
-	//	{
-	//		uniformBufferDescriptorPoolSize,
-	//	};
-
-	//	VkDescriptorPoolCreateInfo descriptorPoolCreateInfo{};
-	//	descriptorPoolCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-	//	descriptorPoolCreateInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
-	//	descriptorPoolCreateInfo.pPoolSizes = poolSizes.data();
-	//	descriptorPoolCreateInfo.maxSets = 1;
-
-	//	VK_CHECK_RESULT(vkCreateDescriptorPool(m_logicalDevice, &descriptorPoolCreateInfo, nullptr, &m_descriptorPool));
-
-	//}
-
-	//void VulkanDevice::setupDescriptorSet()
-	//{
-	//	VkDescriptorSetAllocateInfo descriptorSetAllocateInfo{};
-	//	descriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-	//	descriptorSetAllocateInfo.descriptorPool = m_descriptorPool;
-	//	//	FIXME:
-	//	//	太长的变量名?
-	//	VkDescriptorSetLayout temp = m_pipelineLayout.GetDescriptorSetLayoutHandle();
-	//	descriptorSetAllocateInfo.pSetLayouts = &temp;
-	//	descriptorSetAllocateInfo.descriptorSetCount = 1;
-
-	//	VK_CHECK_RESULT(vkAllocateDescriptorSets(m_logicalDevice, &descriptorSetAllocateInfo, &m_descriptorSet));
-
-	//	VkWriteDescriptorSet writeDescriptorSet{};
-	//	writeDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-	//	writeDescriptorSet.dstSet = m_descriptorSet;
-	//	writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	//	writeDescriptorSet.dstBinding = 0;
-	//	writeDescriptorSet.pBufferInfo = &m_pUniformBuffer.lock()->descriptorBufferInfo;
-	//	writeDescriptorSet.descriptorCount = 1;
-
-	//	vector<VkWriteDescriptorSet> writeDescriptorSets =
-	//	{
-	//		writeDescriptorSet,
-	//	};
-
-	//	vkUpdateDescriptorSets(m_logicalDevice, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
-	//}
-
 	void VulkanDevice::initializeLogicalDevice(void* platformHandle, void* platformWindow)
 	{
 		//	Queue family orioerties must be intialized ahead,
@@ -365,56 +316,27 @@ namespace Core
 		commandBufferAllocateInfo.commandBufferCount = static_cast<uint32>(m_drawCommandBuffers.size());
 		VK_CHECK_RESULT(vkAllocateCommandBuffers(m_logicalDevice, &commandBufferAllocateInfo, m_drawCommandBuffers.data()));
 
-		VkImageCreateInfo imageCreateInfo = {};
-		imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-		imageCreateInfo.pNext = NULL;
-		imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
-		imageCreateInfo.format = m_depthFormat;
-		imageCreateInfo.extent = { m_width, m_height, 1 };
-		imageCreateInfo.mipLevels = 1;
-		imageCreateInfo.arrayLayers = 1;
-		imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
-		imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-		imageCreateInfo.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
-		imageCreateInfo.flags = 0;
+		m_depthStencilImage = std::make_unique<VulkanImage>(
+			m_logicalDevice,
+			m_depthFormat,
+			m_width,
+			m_height,
+			1,
+			VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT
+		);
 
-		VkImageViewCreateInfo depthStencilViewCreateInfo = {};
-		depthStencilViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-		depthStencilViewCreateInfo.pNext = NULL;
-		depthStencilViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-		depthStencilViewCreateInfo.format = m_depthFormat;
-		depthStencilViewCreateInfo.flags = 0;
-		depthStencilViewCreateInfo.subresourceRange = {};
-		depthStencilViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
-		depthStencilViewCreateInfo.subresourceRange.baseMipLevel = 0;
-		depthStencilViewCreateInfo.subresourceRange.levelCount = 1;
-		depthStencilViewCreateInfo.subresourceRange.baseArrayLayer = 0;
-		depthStencilViewCreateInfo.subresourceRange.layerCount = 1;
-
-		VkMemoryRequirements memReqs;
-
-		VkMemoryAllocateInfo memoryAllocateInfo = {};
-		memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-		memoryAllocateInfo.pNext = NULL;
-		memoryAllocateInfo.allocationSize = 0;
-		memoryAllocateInfo.memoryTypeIndex = 0;
-
-		VK_CHECK_RESULT(vkCreateImage(m_logicalDevice, &imageCreateInfo, nullptr, &m_depthStencilImage));
-		vkGetImageMemoryRequirements(m_logicalDevice, m_depthStencilImage, &memReqs);
-		memoryAllocateInfo.allocationSize = memReqs.size;
-		memoryAllocateInfo.memoryTypeIndex = getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-		VK_CHECK_RESULT(vkAllocateMemory(m_logicalDevice, &memoryAllocateInfo, nullptr, &m_depthStencilMemory));
-		VK_CHECK_RESULT(vkBindImageMemory(m_logicalDevice, m_depthStencilImage, m_depthStencilMemory, 0));
-
-		depthStencilViewCreateInfo.image = m_depthStencilImage;
-
-		VK_CHECK_RESULT(vkCreateImageView(m_logicalDevice, &depthStencilViewCreateInfo, nullptr, &m_depthStencilView));
+		m_depthStencilImageView = std::make_unique<VulkanImageView>(
+			m_logicalDevice,
+			m_depthFormat,
+			VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT,
+			m_depthStencilImage->GetHandle()
+		);
 
 		m_renderPass.Initialize(m_logicalDevice, m_swapChain.GetColorFormat(), m_depthFormat);
 
 		VkImageView attachments[2];
 
-		attachments[1] = m_depthStencilView;
+		attachments[1] = m_depthStencilImageView->GetHandle();
 
 		VkFramebufferCreateInfo frameBufferCreateInfo = {};
 		frameBufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
@@ -469,10 +391,6 @@ namespace Core
 
 		m_descriptorSets.PushDescriptorSetLayout(m_pipelineLayout.GetDescriptorSetLayoutHandle(), m_pUniformBuffer.lock()->descriptorBufferInfo);
 		m_descriptorSets.Build(m_logicalDevice);
-
-		//setupDescriptorPool();
-		//setupDescriptorSet();
-		//buildCommandBuffers();
 	}
 
 	VulkanDevice::VulkanDevice()
@@ -524,6 +442,8 @@ namespace Core
 		vkGetPhysicalDeviceProperties(m_physicalDevice, &m_deviceProperties);
 		vkGetPhysicalDeviceFeatures(m_physicalDevice, &m_deviceFeatures);
 		vkGetPhysicalDeviceMemoryProperties(m_physicalDevice, &m_deviceMemoryProperties);
+
+		VulkanGlobal::Instance()->deviceMemoryProperties = m_deviceMemoryProperties;
 
 		uint32 extensionCount;
 		VK_CHECK_RESULT(vkEnumerateDeviceExtensionProperties(m_physicalDevice, nullptr, &extensionCount, nullptr));

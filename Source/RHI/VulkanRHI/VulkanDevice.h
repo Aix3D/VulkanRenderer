@@ -12,32 +12,14 @@
 #include "..\..\Component\RawShader.h"
 #include "VulkanPipeline.h"
 #include "VulkanDescriptorSets.h"
+#include "VulkanImage.h"
+#include "VulkanImageView.h"
 
 #include VECTOR_INCLUDE_PATH
 #include STRING_INCLUDE_PATH
 
 namespace Core
 {
-	//struct Model {
-	//	struct {
-	//		VkBuffer buffer;
-	//		VkDeviceMemory memory;
-	//	} vertices;
-	//	struct {
-	//		int count;
-	//		VkBuffer buffer;
-	//		VkDeviceMemory memory;
-	//	} indices;
-	//	// Destroys all Vulkan resources created for this model
-	//	void destroy(VkDevice device)
-	//	{
-	//		vkDestroyBuffer(device, vertices.buffer, nullptr);
-	//		vkFreeMemory(device, vertices.memory, nullptr);
-	//		vkDestroyBuffer(device, indices.buffer, nullptr);
-	//		vkFreeMemory(device, indices.memory, nullptr);
-	//	};
-	//};
-
 	class VulkanDevice
 	{
 	private:
@@ -56,8 +38,6 @@ namespace Core
 		ANSICHAR * m_pEngineName;
 
 		Bool m_validation;
-
-		///////////////////////////////////////////////////////////////////////////
 		VkDevice m_logicalDevice;
 
 		uint32 m_graphicsQueueFamilyIndex;
@@ -69,9 +49,6 @@ namespace Core
 		VkQueue m_queue;
 
 		VkCommandPool m_commandPool;
-
-		//VulkanCommandBufferPool m_vulaknCommandPool;
-		//ctd::vector<std::unique_ptr<VulkanCommandBuffer>> m_vulkanCommandBuffers;
 
 		VkFormat m_depthFormat;
 
@@ -85,23 +62,12 @@ namespace Core
 
 		ctd::vector<VkCommandBuffer> m_drawCommandBuffers;
 
-		VkImage m_depthStencilImage;
-		VkDeviceMemory m_depthStencilMemory;
-		VkImageView m_depthStencilView;
+		std::unique_ptr<VulkanImage> m_depthStencilImage;
+		std::unique_ptr<VulkanImageView> m_depthStencilImageView;
 
 		VulkanRenderPass m_renderPass;
 
 		ctd::vector<VkFramebuffer> m_frameBuffers;
-
-		//VkDescriptorSetLayout m_descriptorSetLayout;
-		//VkPipelineLayout m_pipelineLayout;
-
-		//std::vector<VkShaderModule> m_shaderModules;
-
-		//VkPipeline m_pipeline;
-
-		//VkDescriptorPool m_descriptorPool;
-		//VkDescriptorSet m_descriptorSet;
 
 		uint32_t m_currentBuffer = 0;
 
@@ -116,8 +82,6 @@ namespace Core
 		VulkanPipelineLayout m_pipelineLayout;
 		VulkanPipeline m_pipeline;
 		VulkanDescriptorSets m_descriptorSets;
-
-		///////////////////////////////////////////////////////////////////////////
 
 		VkBool32 m_messageCallback(
 			VkDebugReportFlagsEXT flags,
@@ -138,8 +102,6 @@ namespace Core
 		Bool getSupportedDepthFormat(VkFormat *depthFormat);
 		uint32 getMemoryType(uint32 typeBits, VkMemoryPropertyFlags properties, VkBool32 *memTypeFound = nullptr);
 
-		//void setupDescriptorPool();
-		//void setupDescriptorSet();
 		
 		void initializeLogicalDevice(void* platformHandle, void* platformWindow);
 

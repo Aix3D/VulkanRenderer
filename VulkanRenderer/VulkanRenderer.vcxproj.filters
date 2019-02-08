@@ -35,6 +35,12 @@
     <Filter Include="Source\Component">
       <UniqueIdentifier>{3afa603d-3a1f-455f-a965-f5c6aea15e52}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\DesignPattern">
+      <UniqueIdentifier>{ff2c3f82-6e77-4d1f-af7f-218d1cf4929a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\DesignPattern\Singleton">
+      <UniqueIdentifier>{717a32a7-6601-4237-926e-815871e81368}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -133,6 +139,21 @@
     <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanDescriptorSets.h">
       <Filter>Source\RHI\Vulkan</Filter>
     </ClInclude>
+    <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanCommandPool.h">
+      <Filter>Source\RHI\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanImage.h">
+      <Filter>Source\RHI\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanImageView.h">
+      <Filter>Source\RHI\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanGlobal.h">
+      <Filter>Source\RHI\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\DesignPattern\Singleton.h">
+      <Filter>Source\DesignPattern\Singleton</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Source\Include\BaseInclude.cpp">
@@ -208,6 +229,18 @@
       <Filter>Source\RHI\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanDescriptorSets.cpp">
+      <Filter>Source\RHI\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanCommandPool.cpp">
+      <Filter>Source\RHI\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanImage.cpp">
+      <Filter>Source\RHI\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanImageView.cpp">
+      <Filter>Source\RHI\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanGlobal.cpp">
       <Filter>Source\RHI\Vulkan</Filter>
     </ClCompile>
   </ItemGroup>

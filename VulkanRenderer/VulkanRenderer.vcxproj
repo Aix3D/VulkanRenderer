@@ -163,6 +163,7 @@
     <ClInclude Include="..\Source\Component\Material.h" />
     <ClInclude Include="..\Source\Component\RawShader.h" />
     <ClInclude Include="..\Source\Component\StaticMesh.h" />
+    <ClInclude Include="..\Source\DesignPattern\Singleton.h" />
     <ClInclude Include="..\Source\Helper\AssetManager.h" />
     <ClInclude Include="..\Source\Include\BaseInclude.h" />
     <ClInclude Include="..\Source\Math\MathBase.h" />
@@ -179,7 +180,11 @@
     <ClInclude Include="..\Source\Platform\Windows\WindowsPlatformCompilerPreSetup.h" />
     <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanBufferManager.h" />
     <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanBufferP.h" />
+    <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanCommandPool.h" />
     <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanDescriptorSets.h" />
+    <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanGlobal.h" />
+    <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanImage.h" />
+    <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanImageView.h" />
     <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanPipelineLayout.h" />
     <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanShaderModule.h" />
     <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanBase.h" />
@@ -206,7 +211,11 @@
     <ClCompile Include="..\Source\Object\Camera.cpp" />
     <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanBufferManager.cpp" />
     <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanBufferP.cpp" />
+    <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanCommandPool.cpp" />
     <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanDescriptorSets.cpp" />
+    <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanGlobal.cpp" />
+    <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanImage.cpp" />
+    <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanImageView.cpp" />
     <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanPipelineLayout.cpp" />
     <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanShaderModule.cpp" />
     <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanBase.cpp" />

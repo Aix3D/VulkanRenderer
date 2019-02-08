@@ -240,31 +240,15 @@ namespace Core
 		m_images.resize(imageCount);
 		m_FPGetSwapchainImagesKHR(m_logicalDeviceRef, m_swapChain, &imageCount, m_images.data());
 
-		m_imageViews.resize(imageCount);
-
 		for (uint32 i = 0; i < imageCount; ++i)
 		{
-			VkImageViewCreateInfo colorAttachmentView = {};
-			colorAttachmentView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-			colorAttachmentView.pNext = NULL;
-			colorAttachmentView.format = m_colorFormat;
-			colorAttachmentView.components =
-			{
-				VK_COMPONENT_SWIZZLE_R,
-				VK_COMPONENT_SWIZZLE_G,
-				VK_COMPONENT_SWIZZLE_B,
-				VK_COMPONENT_SWIZZLE_A
-			};
-			colorAttachmentView.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-			colorAttachmentView.subresourceRange.baseMipLevel = 0;
-			colorAttachmentView.subresourceRange.levelCount = 1;
-			colorAttachmentView.subresourceRange.baseArrayLayer = 0;
-			colorAttachmentView.subresourceRange.layerCount = 1;
-			colorAttachmentView.viewType = VK_IMAGE_VIEW_TYPE_2D;
-			colorAttachmentView.flags = 0;
-			colorAttachmentView.image = m_images[i];
+			std::unique_ptr<VulkanImageView> imageView = std::make_unique<VulkanImageView>(
+				m_logicalDeviceRef,
+				m_colorFormat,
+				VK_IMAGE_ASPECT_COLOR_BIT,
+				m_images[i]);
 
-			VK_CHECK_RESULT(vkCreateImageView(m_logicalDeviceRef, &colorAttachmentView, nullptr, &m_imageViews[i]));
+			m_imageViews.push_back(std::move(imageView));
 		}
 	}
 
@@ -278,9 +262,9 @@ namespace Core
 		return m_colorFormat;
 	}
 
-	VkImageView VulkanSwapChain::GetView(int32 index) const
+	VkImageView VulkanSwapChain::GetView(int32 index)
 	{
-		return m_imageViews[index];
+		return m_imageViews[index]->GetHandle();
 	}
 
 	VkResult VulkanSwapChain::AcquireNextImage(VkSemaphore presentCompleteSemaphore, uint32_t *imageIndex)
