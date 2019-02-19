@@ -32,6 +32,7 @@ ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
+void SetupConsole(std::string title);
 
 HWND g_window;
 
@@ -55,6 +56,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     {
         return FALSE;
     }
+
+	SetupConsole("Vulkan validation output");
 
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_VULKANRENDERER));
 
@@ -191,4 +194,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         return DefWindowProc(hWnd, message, wParam, lParam);
     }
     return 0;
+}
+
+void SetupConsole(std::string title)
+{
+	AllocConsole();
+	AttachConsole(GetCurrentProcessId());
+	FILE *stream;
+	freopen_s(&stream, "CONOUT$", "w+", stdout);
+	freopen_s(&stream, "CONOUT$", "w+", stderr);
+	SetConsoleTitle(TEXT(title.c_str()));
 }

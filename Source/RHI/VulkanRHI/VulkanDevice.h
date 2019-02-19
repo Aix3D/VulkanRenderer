@@ -20,6 +20,16 @@
 
 namespace Core
 {
+	VkBool32 messageCallback(
+		VkDebugReportFlagsEXT                       flags,
+		VkDebugReportObjectTypeEXT                  objectType,
+		uint64_t                                    object,
+		size_t                                      location,
+		int32_t                                     messageCode,
+		const char*                                 pLayerPrefix,
+		const char*                                 pMessage,
+
+		void*                                       pUserData);
 	class VulkanDevice
 	{
 	private:
@@ -83,19 +93,11 @@ namespace Core
 		VulkanPipeline m_pipeline;
 		VulkanDescriptorSets m_descriptorSets;
 
-		VkBool32 m_messageCallback(
-			VkDebugReportFlagsEXT flags,
-			VkDebugReportObjectTypeEXT objType,
-			uint64_t srcObject,
-			size_t location,
-			int32_t msgCode,
-			const char* pLayerPrefix,
-			const char* pMsg,
-			void* pUserData);
-
 		PFN_vkCreateDebugReportCallbackEXT m_PFN_createDebugReportCallback = VK_NULL_HANDLE;
 		PFN_vkDestroyDebugReportCallbackEXT m_PFN_destroyDebugReportCallback = VK_NULL_HANDLE;
 		PFN_vkDebugReportMessageEXT m_PFN_dbgBreakCallback = VK_NULL_HANDLE;
+
+		VkDebugReportCallbackEXT m_msgCallback;
 
 		ErrorCode createVKInstance();
 		uint32 getQueueFamilyIndex(VkQueueFlagBits queueFlagBits);
