@@ -41,6 +41,9 @@
     <Filter Include="Source\DesignPattern\Singleton">
       <UniqueIdentifier>{717a32a7-6601-4237-926e-815871e81368}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Assets">
+      <UniqueIdentifier>{9967f6af-3498-4d91-b0ca-d92fcafe337c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -136,9 +139,6 @@
     <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanVertexInputState.h">
       <Filter>Source\RHI\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanDescriptorSets.h">
-      <Filter>Source\RHI\Vulkan</Filter>
-    </ClInclude>
     <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanCommandPool.h">
       <Filter>Source\RHI\Vulkan</Filter>
     </ClInclude>
@@ -153,6 +153,18 @@
     </ClInclude>
     <ClInclude Include="..\Source\DesignPattern\Singleton.h">
       <Filter>Source\DesignPattern\Singleton</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Asset\VulkanTexture.h">
+      <Filter>Source\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanDescriptorSetLayout.h">
+      <Filter>Source\RHI\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanDescriptorPool.h">
+      <Filter>Source\RHI\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanDescriptorSet.h">
+      <Filter>Source\RHI\Vulkan</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -228,9 +240,6 @@
     <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanVertexInputState.cpp">
       <Filter>Source\RHI\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanDescriptorSets.cpp">
-      <Filter>Source\RHI\Vulkan</Filter>
-    </ClCompile>
     <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanCommandPool.cpp">
       <Filter>Source\RHI\Vulkan</Filter>
     </ClCompile>
@@ -241,6 +250,18 @@
       <Filter>Source\RHI\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanGlobal.cpp">
+      <Filter>Source\RHI\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Asset\VulkanTexture.cpp">
+      <Filter>Source\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanDescriptorSetLayout.cpp">
+      <Filter>Source\RHI\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanDescriptorPool.cpp">
+      <Filter>Source\RHI\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanDescriptorSet.cpp">
       <Filter>Source\RHI\Vulkan</Filter>
     </ClCompile>
   </ItemGroup>

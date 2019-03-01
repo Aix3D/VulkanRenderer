@@ -3,17 +3,14 @@
 namespace Core
 {
 	VulkanBufferP::VulkanBufferP()
+		:mapped(Null)
 	{
 
 	}
 
-	void * VulkanBufferP::Map(VkDevice device, VkDeviceSize offset, VkDeviceSize size)
+	void VulkanBufferP::Map(VkDevice device, VkDeviceSize offset, VkDeviceSize size)
 	{
-		void *mapped;
-
 		VK_CHECK_RESULT(vkMapMemory(device, memory, offset, size, 0, &mapped));
-
-		return mapped;
 	}
 
 	void VulkanBufferP::Unmap(VkDevice device, VkDeviceSize size)

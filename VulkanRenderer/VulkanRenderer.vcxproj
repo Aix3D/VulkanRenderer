@@ -160,6 +160,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Source\Asset\VulkanTexture.h" />
     <ClInclude Include="..\Source\Component\Material.h" />
     <ClInclude Include="..\Source\Component\RawShader.h" />
     <ClInclude Include="..\Source\Component\StaticMesh.h" />
@@ -181,7 +182,9 @@
     <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanBufferManager.h" />
     <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanBufferP.h" />
     <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanCommandPool.h" />
-    <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanDescriptorSets.h" />
+    <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanDescriptorPool.h" />
+    <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanDescriptorSetLayout.h" />
+    <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanDescriptorSet.h" />
     <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanGlobal.h" />
     <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanImage.h" />
     <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanImageView.h" />
@@ -198,6 +201,7 @@
     <ClInclude Include="Resource.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Source\Asset\VulkanTexture.cpp" />
     <ClCompile Include="..\Source\Component\Material.cpp" />
     <ClCompile Include="..\Source\Component\RawShader.cpp" />
     <ClCompile Include="..\Source\Component\StaticMesh.cpp" />
@@ -212,7 +216,9 @@
     <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanBufferManager.cpp" />
     <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanBufferP.cpp" />
     <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanCommandPool.cpp" />
-    <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanDescriptorSets.cpp" />
+    <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanDescriptorPool.cpp" />
+    <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanDescriptorSetLayout.cpp" />
+    <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanDescriptorSet.cpp" />
     <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanGlobal.cpp" />
     <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanImage.cpp" />
     <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanImageView.cpp" />

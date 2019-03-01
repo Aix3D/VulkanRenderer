@@ -1,3 +1,6 @@
 ﻿  VulkanDevice.cpp
+  VulkanDescriptorPool.cpp
+f:\vulkanrenderer\source\rhi\vulkanrhi\vulkandescriptorpool.cpp(20): warning C4267: '=': conversion from 'size_t' to 'uint32_t', possible loss of data
+  Generating Code...
   VulkanRenderer.vcxproj -> F:\VulkanRenderer\\bin\x64\Debug\VulkanRenderer.exe
   VulkanRenderer.vcxproj -> F:\VulkanRenderer\\bin\x64\Debug\VulkanRenderer.pdb (Full PDB)

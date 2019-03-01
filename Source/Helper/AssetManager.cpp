@@ -5,6 +5,7 @@
 #include <assimp/cimport.h>
 #include <fstream>
 #include <io.h>
+#include <MathGlobal.h>
 
 #include VECTOR_INCLUDE_PATH
 
@@ -60,6 +61,38 @@ namespace Core
 					staitcMeshMap[meshName]->indices.push_back(currentMesh->mFaces[faceIndex].mIndices[triangleIndex]);
 				}
 			}
+
+			aiMaterial * currentMaterial = scene->mMaterials[meshIndex];
+
+			aiString materialName;
+			currentMaterial->Get(AI_MATKEY_NAME, materialName);
+
+			std::shared_ptr<Material> material = std::make_shared<Material>();
+			materialMap[materialName.C_Str()] = material;
+
+			aiColor4D color;
+			currentMaterial->Get(AI_MATKEY_COLOR_AMBIENT, color);
+			material->properites.ambient = Vector4(color.r, color.g, color.b, color.a);
+			currentMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+			material->properites.diffuse = Vector4(color.r, color.g, color.b, color.a);
+			currentMaterial->Get(AI_MATKEY_COLOR_SPECULAR, color);
+			material->properites.specular = Vector4(color.r, color.g, color.b, color.a);
+			currentMaterial->Get(AI_MATKEY_OPACITY, material->properites.opacity);
+
+			if ((material->properites.opacity) > 0.0f)
+				material->properites.specular = Vector4Dummy ;
+
+			// Diffuse
+			if (currentMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0)
+			{
+				aiString textureName;
+
+				currentMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &textureName);
+				string fileName = string(textureName.C_Str());
+				replace(fileName.begin(), fileName.end(), '\\', '/');
+				fileName.insert(fileName.find(".ktx"), "_bc3_unorm");
+				LoadTexture(const_cast<ANSICHAR*>(fileName.c_str()));
+			}
 		}
 	}
 
@@ -89,6 +122,20 @@ namespace Core
 		return Null;
 	}
 
+	std::shared_ptr<VulkanTexture> AssetManager::LoadTexture(ANSICHAR * textureName)
+	{
+		string fileFullPathName = textureFullPath;
+		fileFullPathName += "\\";
+		fileFullPathName += textureName;
+
+		gli::texture2d tex2D(gli::load(fileFullPathName));
+
+		textureMap[textureName] = std::make_shared<VulkanTexture>();
+		textureMap[textureName]->rawTexture = tex2D;
+	
+		return textureMap[textureName];
+	}
+
 	void AssetManager::UploadToGPU(VulkanDevice * pDevice)
 	{
 		for (map<ctd::string, std::shared_ptr<StaticMesh>>::iterator iter = staitcMeshMap.begin();
@@ -110,6 +157,23 @@ namespace Core
 				&iter->second->indexBuffer,
 				&iter->second->indexMemory,
 				iter->second->indices.data());
+		}
+
+		for (map<std::string, std::shared_ptr<VulkanTexture>>::iterator iter = textureMap.begin();
+			iter != textureMap.end();
+			++iter)
+		{
+			iter->second->UploadToGPU(pDevice);
+		}
+	}
+
+	void AssetManager::UploadTexture(VulkanDevice * pDevice)
+	{
+		for (map<ctd::string, std::shared_ptr<VulkanTexture>>::iterator iter = textureMap.begin();
+			iter != textureMap.end();
+			++iter)
+		{
+			iter->second->UploadToGPU(pDevice);
 		}
 	}
 
@@ -143,6 +207,11 @@ namespace Core
 			pDevice->AddCommand(bindIndexBuffer);
 			pDevice->AddCommand(drawIndexed);
 		}
+	}
+
+	std::shared_ptr<Core::VulkanTexture> AssetManager::GetAnyTexture()
+	{
+		return textureMap["KAMEN-stup_bc3_unorm.ktx"];
 	}
 
 	AssetManager::~AssetManager()

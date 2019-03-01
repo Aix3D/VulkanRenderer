@@ -11,9 +11,12 @@
 #include "VulkanPipelineLayout.h"
 #include "..\..\Component\RawShader.h"
 #include "VulkanPipeline.h"
-#include "VulkanDescriptorSets.h"
 #include "VulkanImage.h"
 #include "VulkanImageView.h"
+#include "..\..\Object\Camera.h"
+#include "VulkanDescriptorSetLayout.h"
+#include "VulkanDescriptorPool.h"
+#include "VulkanDescriptorSet.h"
 
 #include VECTOR_INCLUDE_PATH
 #include STRING_INCLUDE_PATH
@@ -89,9 +92,12 @@ namespace Core
 		std::weak_ptr<VulkanBufferP> m_pUniformBuffer;
 
 		VulkanVertexInputState m_inputState;
+		VulkanDescriptorSetLayout m_descriptorSetLayout;
+		VulkanDescriptorPool m_descriptorPool;
+		VulkanDescriptorSet m_descriptorSet;
 		VulkanPipelineLayout m_pipelineLayout;
 		VulkanPipeline m_pipeline;
-		VulkanDescriptorSets m_descriptorSets;
+		
 
 		PFN_vkCreateDebugReportCallbackEXT m_PFN_createDebugReportCallback = VK_NULL_HANDLE;
 		PFN_vkDestroyDebugReportCallbackEXT m_PFN_destroyDebugReportCallback = VK_NULL_HANDLE;
@@ -113,6 +119,7 @@ namespace Core
 	public:
 		VulkanDevice();
 		ErrorCode Initialize(std::shared_ptr<RawShader> pVertexShader, std::shared_ptr<RawShader> pFragmentShader, void* platformHandle, void* platformWindow);
+		void PrepareSTH(VkDescriptorImageInfo imageInfo);
 		void Draw();
 		void CreateBuffer(VkBufferUsageFlags usageFlags, VkMemoryPropertyFlags memoryPropertyFlags, VkDeviceSize size, VkBuffer *buffer, VkDeviceMemory *memory, void *data /*= nullptr*/);
 		VkCommandBuffer CreateCommandBuffer(VkCommandBufferLevel level, bool begin);
@@ -121,6 +128,22 @@ namespace Core
 		void AddCommand(Command * pMommand);
 		void RemoveCommand(uint32 commandID);
 		void BuildCommandBuffers();
+
+		void UpdateCamera(Camera camera);
+		VkFormatProperties GetPhysicalDeviceFormatProperties(VkFormat format) const;
+		VkDevice GetLogicalDevice();
+		void SetImageLayout(
+			VkCommandBuffer cmdbuffer,
+			VkImage image,
+			VkImageAspectFlags aspectMask,
+			VkImageLayout oldImageLayout,
+			VkImageLayout newImageLayout,
+			VkImageSubresourceRange subresourceRange,
+			VkPipelineStageFlags srcStageMask = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
+			VkPipelineStageFlags dstStageMask = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT);
+
+		VkQueue GetQueue() const;
+
 		~VulkanDevice();
 	};
 }

@@ -324,111 +324,12 @@ namespace Core
 		cmdPoolCreateInfo.queueFamilyIndex = m_graphicsQueueFamilyIndex;
 		cmdPoolCreateInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
 		VK_CHECK_RESULT(vkCreateCommandPool(m_logicalDevice, &cmdPoolCreateInfo, nullptr, &m_commandPool));
-
+	
 		getSupportedDepthFormat(&m_depthFormat);
 
 		m_swapChain.Connect(m_instance, m_physicalDevice, m_logicalDevice);
 		m_swapChain.InitializeSurface(platformHandle, platformWindow, m_queueFamilyProperties);
 		m_swapChain.Prepare(&m_width, &m_height, True);
-
-		VkSemaphoreCreateInfo semaphoreCreateInfo{};
-		semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-
-		VK_CHECK_RESULT(vkCreateSemaphore(m_logicalDevice, &semaphoreCreateInfo, nullptr, &m_presentCompleteSemaphore));
-		VK_CHECK_RESULT(vkCreateSemaphore(m_logicalDevice, &semaphoreCreateInfo, nullptr, &m_renderCompleteSemaphore));
-
-		m_submitInfo = {};
-		m_submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-		m_submitInfo.pWaitDstStageMask = &m_submitPipelineStages;
-		m_submitInfo.waitSemaphoreCount = 1;
-		m_submitInfo.pWaitSemaphores = &m_presentCompleteSemaphore;
-		m_submitInfo.signalSemaphoreCount = 1;
-		m_submitInfo.pSignalSemaphores = &m_renderCompleteSemaphore;
-
-		m_drawCommandBuffers.resize(m_swapChain.GetImageCount());
-
-		VkCommandBufferAllocateInfo commandBufferAllocateInfo{};
-		commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-		commandBufferAllocateInfo.commandPool = m_commandPool;
-		commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-		commandBufferAllocateInfo.commandBufferCount = static_cast<uint32>(m_drawCommandBuffers.size());
-		VK_CHECK_RESULT(vkAllocateCommandBuffers(m_logicalDevice, &commandBufferAllocateInfo, m_drawCommandBuffers.data()));
-
-		m_depthStencilImage = std::make_unique<VulkanImage>(
-			m_logicalDevice,
-			m_depthFormat,
-			m_width,
-			m_height,
-			1,
-			VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT
-		);
-
-		m_depthStencilImageView = std::make_unique<VulkanImageView>(
-			m_logicalDevice,
-			m_depthFormat,
-			VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT,
-			m_depthStencilImage->GetHandle()
-		);
-
-		m_renderPass.Initialize(m_logicalDevice, m_swapChain.GetColorFormat(), m_depthFormat);
-
-		VkImageView attachments[2];
-
-		attachments[1] = m_depthStencilImageView->GetHandle();
-
-		VkFramebufferCreateInfo frameBufferCreateInfo = {};
-		frameBufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-		frameBufferCreateInfo.pNext = NULL;
-		frameBufferCreateInfo.renderPass = m_renderPass.Get();
-		frameBufferCreateInfo.attachmentCount = 2;
-		frameBufferCreateInfo.pAttachments = attachments;
-		frameBufferCreateInfo.width = m_width;
-		frameBufferCreateInfo.height = m_height;
-		frameBufferCreateInfo.layers = 1;
-
-		// Create frame buffers for every swap chain image
-		m_frameBuffers.resize(m_swapChain.GetImageCount());
-		for (uint32_t i = 0; i < m_frameBuffers.size(); ++i)
-		{
-			attachments[0] = m_swapChain.GetView(i);
-			VK_CHECK_RESULT(vkCreateFramebuffer(m_logicalDevice, &frameBufferCreateInfo, nullptr, &m_frameBuffers[i]));
-		}
-
-		//setupVertexDescriptions();
-
-		m_inputState.PushBindingDescription(0, sizeof(VertexP), VK_VERTEX_INPUT_RATE_VERTEX);
-		m_inputState.PushAttributeDescription(0, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(VertexP, position));
-		m_inputState.PushAttributeDescription(0, 1, VK_FORMAT_R32G32B32_SFLOAT, offsetof(VertexP, normal));
-		m_inputState.PushAttributeDescription(0, 2, VK_FORMAT_R32G32_SFLOAT, offsetof(VertexP, uv0));
-		m_inputState.PushAttributeDescription(0, 3, VK_FORMAT_R32G32B32_SFLOAT, offsetof(VertexP, color));
-		m_inputState.Build(m_logicalDevice);
-
-		m_pUniformBuffer = m_pBufferManager->CreateBuffer(
-			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-			sizeof(uboVS));
-
-		m_pUniformBuffer.lock()->SetDescriptorBufferInfo();
-
-		void * mapped = m_pUniformBuffer.lock()->Map(m_logicalDevice, 0, sizeof(uboVS));
-
-		uboVS.projection = Perspective(90.0f * Deg2Rad, (float)m_width / (float)m_height, 0.1f, 256.0f);
-		uboVS.model = Translate(Matrix4x4Identify, Vector3(0.0f, 0.0f, -8.0f));
-
-		memcpy(mapped, &uboVS, sizeof(uboVS));
-
-		m_pUniformBuffer.lock()->Unmap(m_logicalDevice, sizeof(uboVS));
-
-		m_pipelineLayout.PushLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 0);
-		m_pipelineLayout.Build(m_logicalDevice);
-
-		m_pipeline.PushShader(m_logicalDevice, VK_SHADER_STAGE_VERTEX_BIT, *m_pVertexShaderData.lock()->pRawData, m_pVertexShaderData.lock()->size);
-		m_pipeline.PushShader(m_logicalDevice, VK_SHADER_STAGE_FRAGMENT_BIT, *m_pFragmentShaderData.lock()->pRawData, m_pFragmentShaderData.lock()->size);
-
-		m_pipeline.Build(m_logicalDevice, m_inputState, m_pipelineLayout, m_renderPass);
-
-		m_descriptorSets.PushDescriptorSetLayout(m_pipelineLayout.GetDescriptorSetLayoutHandle(), m_pUniformBuffer.lock()->descriptorBufferInfo);
-		m_descriptorSets.Build(m_logicalDevice);
 	}
 
 	VulkanDevice::VulkanDevice()
@@ -503,6 +404,121 @@ namespace Core
 
 
 		return ErrorCode_OK;
+	}
+
+	void VulkanDevice::PrepareSTH(VkDescriptorImageInfo imageInfo)
+	{
+		VkSemaphoreCreateInfo semaphoreCreateInfo{};
+		semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+		VK_CHECK_RESULT(vkCreateSemaphore(m_logicalDevice, &semaphoreCreateInfo, nullptr, &m_presentCompleteSemaphore));
+		VK_CHECK_RESULT(vkCreateSemaphore(m_logicalDevice, &semaphoreCreateInfo, nullptr, &m_renderCompleteSemaphore));
+
+		m_submitInfo = {};
+		m_submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+		m_submitInfo.pWaitDstStageMask = &m_submitPipelineStages;
+		m_submitInfo.waitSemaphoreCount = 1;
+		m_submitInfo.pWaitSemaphores = &m_presentCompleteSemaphore;
+		m_submitInfo.signalSemaphoreCount = 1;
+		m_submitInfo.pSignalSemaphores = &m_renderCompleteSemaphore;
+
+		m_drawCommandBuffers.resize(m_swapChain.GetImageCount());
+
+		VkCommandBufferAllocateInfo commandBufferAllocateInfo{};
+		commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+		commandBufferAllocateInfo.commandPool = m_commandPool;
+		commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+		commandBufferAllocateInfo.commandBufferCount = static_cast<uint32>(m_drawCommandBuffers.size());
+		VK_CHECK_RESULT(vkAllocateCommandBuffers(m_logicalDevice, &commandBufferAllocateInfo, m_drawCommandBuffers.data()));
+
+		m_depthStencilImage = std::make_unique<VulkanImage>(
+			m_logicalDevice,
+			m_depthFormat,
+			m_width,
+			m_height,
+			1,
+			VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT
+			);
+
+		m_depthStencilImageView = std::make_unique<VulkanImageView>(
+			m_logicalDevice,
+			m_depthFormat,
+			VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT,
+			m_depthStencilImage->GetHandle()
+			);
+
+		m_renderPass.Initialize(m_logicalDevice, m_swapChain.GetColorFormat(), m_depthFormat);
+
+		VkImageView attachments[2];
+
+		attachments[1] = m_depthStencilImageView->GetHandle();
+
+		VkFramebufferCreateInfo frameBufferCreateInfo = {};
+		frameBufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+		frameBufferCreateInfo.pNext = NULL;
+		frameBufferCreateInfo.renderPass = m_renderPass.Get();
+		frameBufferCreateInfo.attachmentCount = 2;
+		frameBufferCreateInfo.pAttachments = attachments;
+		frameBufferCreateInfo.width = m_width;
+		frameBufferCreateInfo.height = m_height;
+		frameBufferCreateInfo.layers = 1;
+
+		// Create frame buffers for every swap chain image
+		m_frameBuffers.resize(m_swapChain.GetImageCount());
+		for (uint32_t i = 0; i < m_frameBuffers.size(); ++i)
+		{
+			attachments[0] = m_swapChain.GetView(i);
+			VK_CHECK_RESULT(vkCreateFramebuffer(m_logicalDevice, &frameBufferCreateInfo, nullptr, &m_frameBuffers[i]));
+		}
+
+		//setupVertexDescriptions();
+
+		m_inputState.PushBindingDescription(0, sizeof(VertexP), VK_VERTEX_INPUT_RATE_VERTEX);
+		m_inputState.PushAttributeDescription(0, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(VertexP, position));
+		m_inputState.PushAttributeDescription(0, 1, VK_FORMAT_R32G32B32_SFLOAT, offsetof(VertexP, normal));
+		m_inputState.PushAttributeDescription(0, 2, VK_FORMAT_R32G32_SFLOAT, offsetof(VertexP, uv0));
+		m_inputState.PushAttributeDescription(0, 3, VK_FORMAT_R32G32B32_SFLOAT, offsetof(VertexP, color));
+		m_inputState.Build(m_logicalDevice);
+
+		m_pUniformBuffer = m_pBufferManager->CreateBuffer(
+			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+			sizeof(uboVS));
+
+		m_pUniformBuffer.lock()->SetDescriptorBufferInfo();
+
+		uboVS.projection = Perspective(90.0f * Deg2Rad, (float)m_width / (float)m_height, 0.1f, 256.0f);
+		uboVS.model = Translate(Matrix4x4Identify, Vector3(0.0f, 0.0f, -8.0f));
+
+		m_pUniformBuffer.lock()->Map(m_logicalDevice, 0, sizeof(uboVS));
+
+		memcpy(m_pUniformBuffer.lock()->mapped, &uboVS, sizeof(uboVS));
+
+		m_pUniformBuffer.lock()->Unmap(m_logicalDevice, sizeof(uboVS));
+
+		m_descriptorPool.PushPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1);
+		m_descriptorPool.PushPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1);
+		m_descriptorPool.Build(m_logicalDevice);
+
+		m_descriptorSetLayout.PushLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 0, 1);
+		m_descriptorSetLayout.PushLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 1, 1);
+		m_descriptorSetLayout.Build(m_logicalDevice);
+
+		vector<VkDescriptorSetLayout> descriptorSetLayoutHandles;
+		descriptorSetLayoutHandles.push_back(m_descriptorSetLayout.GetHandle());
+
+		m_pipelineLayout.Build(m_logicalDevice, descriptorSetLayoutHandles);
+
+		m_pipeline.PushShader(m_logicalDevice, VK_SHADER_STAGE_VERTEX_BIT, *m_pVertexShaderData.lock()->pRawData, m_pVertexShaderData.lock()->size);
+		m_pipeline.PushShader(m_logicalDevice, VK_SHADER_STAGE_FRAGMENT_BIT, *m_pFragmentShaderData.lock()->pRawData, m_pFragmentShaderData.lock()->size);
+
+		m_pipeline.Build(m_logicalDevice, m_inputState, m_pipelineLayout, m_renderPass);
+
+		m_descriptorSet.SetDescriptorSetLayout(m_descriptorSetLayout.GetHandle());
+		m_descriptorSet.PushDescriptorInfo(m_pUniformBuffer.lock()->descriptorBufferInfo);
+		m_descriptorSet.PushDescriptorInfo(imageInfo);
+		
+		m_descriptorSet.Build(m_logicalDevice, m_descriptorPool.GetHandle());
 	}
 
 	void VulkanDevice::Draw()
@@ -606,9 +622,7 @@ namespace Core
 		VK_CHECK_RESULT(vkQueueWaitIdle(m_queue));
 
 		if (free)
-		{
 			vkFreeCommandBuffers(m_logicalDevice, m_commandPool, 1, &commandBuffer);
-		}
 	}
 
 	void VulkanDevice::AddCommand(Command * pMommand)
@@ -665,7 +679,8 @@ namespace Core
 
 			vkCmdSetScissor(m_drawCommandBuffers[i], 0, 1, &scissor);
 
-			vkCmdBindDescriptorSets(m_drawCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout.GetPipelineLayoutHandle(), 0, m_descriptorSets.GetHandleCount(), m_descriptorSets.GetHandle(), 0, NULL);
+			VkDescriptorSet temp = m_descriptorSet.GetHandle();
+			vkCmdBindDescriptorSets(m_drawCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout.GetPipelineLayoutHandle(), 0, 1, &temp, 0, NULL);
 			vkCmdBindPipeline(m_drawCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline.GetHandle());
 
 			//VkDeviceSize offsets[1] = { 0 };
@@ -689,6 +704,153 @@ namespace Core
 			VK_CHECK_RESULT(vkEndCommandBuffer(m_drawCommandBuffers[i]));
 		}
 	}
+
+	void VulkanDevice::UpdateCamera(Camera camera)
+	{		
+		uboVS.model = camera.m_viewMatrix;
+		uboVS.projection = camera.m_perspectiveMatrix;
+
+		if (!m_pUniformBuffer.lock()->mapped)
+			m_pUniformBuffer.lock()->Map(m_logicalDevice, 0, sizeof(uboVS));
+
+		memcpy(m_pUniformBuffer.lock()->mapped, &uboVS, sizeof(uboVS));
+
+		//m_pUniformBuffer.lock()->Unmap(m_logicalDevice, sizeof(uboVS));
+	}
+
+	VkFormatProperties VulkanDevice::GetPhysicalDeviceFormatProperties(VkFormat format) const
+	{
+		VkFormatProperties formatProperties;
+		vkGetPhysicalDeviceFormatProperties(m_physicalDevice, format, &formatProperties);
+
+		return formatProperties;
+	}
+
+	VkDevice VulkanDevice::GetLogicalDevice()
+	{
+		return m_logicalDevice;
+	}
+
+	void VulkanDevice::SetImageLayout(VkCommandBuffer cmdbuffer, VkImage image, VkImageAspectFlags aspectMask, VkImageLayout oldImageLayout, VkImageLayout newImageLayout, VkImageSubresourceRange subresourceRange, VkPipelineStageFlags srcStageMask /*= VK_PIPELINE_STAGE_ALL_COMMANDS_BIT*/, VkPipelineStageFlags dstStageMask /*= VK_PIPELINE_STAGE_ALL_COMMANDS_BIT*/)
+	{
+		// Create an image barrier object
+		VkImageMemoryBarrier imageMemoryBarrier{};
+		imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+		imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+		imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+		
+		imageMemoryBarrier.oldLayout = oldImageLayout;
+		imageMemoryBarrier.newLayout = newImageLayout;
+		imageMemoryBarrier.image = image;
+		imageMemoryBarrier.subresourceRange = subresourceRange;
+
+		// Source layouts (old)
+		// Source access mask controls actions that have to be finished on the old layout
+		// before it will be transitioned to the new layout
+		switch (oldImageLayout)
+		{
+		case VK_IMAGE_LAYOUT_UNDEFINED:
+			// Image layout is undefined (or does not matter)
+			// Only valid as initial layout
+			// No flags required, listed only for completeness
+			imageMemoryBarrier.srcAccessMask = 0;
+			break;
+
+		case VK_IMAGE_LAYOUT_PREINITIALIZED:
+			// Image is preinitialized
+			// Only valid as initial layout for linear images, preserves memory contents
+			// Make sure host writes have been finished
+			imageMemoryBarrier.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT;
+			break;
+
+		case VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL:
+			// Image is a color attachment
+			// Make sure any writes to the color buffer have been finished
+			imageMemoryBarrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+			break;
+
+		case VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL:
+			// Image is a depth/stencil attachment
+			// Make sure any writes to the depth/stencil buffer have been finished
+			imageMemoryBarrier.srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+			break;
+
+		case VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL:
+			// Image is a transfer source 
+			// Make sure any reads from the image have been finished
+			imageMemoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+			break;
+
+		case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:
+			// Image is a transfer destination
+			// Make sure any writes to the image have been finished
+			imageMemoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+			break;
+
+		case VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL:
+			// Image is read by a shader
+			// Make sure any shader reads from the image have been finished
+			imageMemoryBarrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
+			break;
+		}
+
+		// Target layouts (new)
+		// Destination access mask controls the dependency for the new image layout
+		switch (newImageLayout)
+		{
+		case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:
+			// Image will be used as a transfer destination
+			// Make sure any writes to the image have been finished
+			imageMemoryBarrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+			break;
+
+		case VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL:
+			// Image will be used as a transfer source
+			// Make sure any reads from and writes to the image have been finished
+			imageMemoryBarrier.srcAccessMask = imageMemoryBarrier.srcAccessMask | VK_ACCESS_TRANSFER_READ_BIT;
+			imageMemoryBarrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+			break;
+
+		case VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL:
+			// Image will be used as a color attachment
+			// Make sure any writes to the color buffer have been finished
+			imageMemoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+			imageMemoryBarrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+			break;
+
+		case VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL:
+			// Image layout will be used as a depth/stencil attachment
+			// Make sure any writes to depth/stencil buffer have been finished
+			imageMemoryBarrier.dstAccessMask = imageMemoryBarrier.dstAccessMask | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+			break;
+
+		case VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL:
+			// Image will be read in a shader (sampler, input attachment)
+			// Make sure any writes to the image have been finished
+			if (imageMemoryBarrier.srcAccessMask == 0)
+			{
+				imageMemoryBarrier.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT | VK_ACCESS_TRANSFER_WRITE_BIT;
+			}
+			imageMemoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+			break;
+		}
+
+		// Put barrier inside setup command buffer
+		vkCmdPipelineBarrier(
+			cmdbuffer,
+			srcStageMask,
+			dstStageMask,
+			0,
+			0, nullptr,
+			0, nullptr,
+			1, &imageMemoryBarrier);
+	}
+
+	VkQueue VulkanDevice::GetQueue() const
+	{
+		return m_queue;
+	}
+
 
 	VulkanDevice::~VulkanDevice()
 	{

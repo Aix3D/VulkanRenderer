@@ -11,9 +11,10 @@ namespace Core
 		VkDeviceMemory memory;
 		VkMemoryPropertyFlags memoryPropertyFlags;
 		VkDescriptorBufferInfo descriptorBufferInfo;
+		void* mapped;
 
 		VulkanBufferP();
-		void * Map(VkDevice device, VkDeviceSize offset, VkDeviceSize size);
+		void Map(VkDevice device, VkDeviceSize offset, VkDeviceSize size);
 		void Unmap(VkDevice device, VkDeviceSize size);
 		void SetDescriptorBufferInfo();
 		~VulkanBufferP();

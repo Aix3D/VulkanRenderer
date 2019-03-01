@@ -19,13 +19,26 @@
 #include "../Source/Helper/AssetManager.h"
 #include "../Source/RHI/VulkanRHI/VulkanCommand.h"
 #include "../Source/Component/RawShader.h"
+#include "../Source/Object/Camera.h"
 
 #define MAX_LOADSTRING 100
+
+#define KEY_W 0x57
+#define KEY_A 0x41
+#define KEY_S 0x53
+#define KEY_D 0x44
+#define KEY_Q 0x51
+#define KEY_E 0x45
+#define VK_LSHIFT 0xA0
+#define VK_RSHIFT 0xA1
 
 // Global Variables:
 HINSTANCE hInst;                                // current instance
 WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
 WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
+
+const int width = 1024;
+const int height = 768;
 
 // Forward declarations of functions included in this code module:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -35,6 +48,7 @@ INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 void SetupConsole(std::string title);
 
 HWND g_window;
+Core::InputState g_inputState;
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -61,6 +75,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_VULKANRENDERER));
 
+	LARGE_INTEGER frequence;
+	QueryPerformanceFrequency(&frequence);
+
+	LARGE_INTEGER lastTime;
+	lastTime.LowPart = 0;
+	lastTime.HighPart = 0;
+	LARGE_INTEGER currentTime;
+
 	std::shared_ptr<Core::AssetManager> assetManager = std::make_shared<Core::AssetManager>();
 	
 	std::shared_ptr<Core::RawShader> pVertexShader = assetManager->LoadRawShader("mesh.vert.spv");
@@ -68,14 +90,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	std::unique_ptr<Core::VulkanDevice> vulkanDevice = std::make_unique<Core::VulkanDevice>();
 	vulkanDevice->Initialize(pVertexShader, pFragmentShader, hInstance, g_window);
-
-	assetManager->LoadFBX("voyager.dae");// "cube.fbx");
+	assetManager->LoadFBX("sibenik.dae");// voyager.dae");// "cube.fbx");
 	
 	assetManager->UploadToGPU(vulkanDevice.get());
+	vulkanDevice->PrepareSTH(assetManager->GetAnyTexture()->descriptor);
 
 	assetManager->CommitToDrawList(vulkanDevice.get());
 
 	vulkanDevice->BuildCommandBuffers();
+
+	Core::Camera camera{ width , height };
 
 	MSG msg = { 0 };
 
@@ -88,6 +112,23 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		}
 		else
 		{
+			float elasped = 0;
+
+			if (lastTime.LowPart == 0 && lastTime.HighPart == 0)
+			{
+				QueryPerformanceCounter(&lastTime);
+			}
+			else
+			{
+				QueryPerformanceCounter(&currentTime);
+
+				elasped = ((currentTime.QuadPart - lastTime.QuadPart) * 1000.0f) / frequence.QuadPart;
+				elasped /= 1000.0f;
+				lastTime = currentTime;
+			}
+
+			camera.Tick(elasped, g_inputState);
+			vulkanDevice->UpdateCamera(camera);
 			vulkanDevice->Draw();
 		}
 	}
@@ -137,8 +178,19 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
    hInst = hInstance; // Store instance handle in our global variable
 
+   RECT windowRect;
+   windowRect.left = 0L;
+   windowRect.top = 0L;
+   windowRect.right = width;
+   windowRect.bottom = height;
+
+   DWORD dwExStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
+   DWORD dwStyle = WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN; 
+
+   AdjustWindowRectEx(&windowRect, dwStyle, FALSE, dwExStyle);
+
    g_window = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-      CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
+      CW_USEDEFAULT, 0, windowRect.right - windowRect.left, windowRect.bottom - windowRect.top, nullptr, nullptr, hInstance, nullptr);
 
    if (!g_window)
    {
@@ -165,6 +217,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {
+	case WM_CLOSE:
+		DestroyWindow(hWnd);
+		PostQuitMessage(0);
+		break;
     case WM_COMMAND:
         {
             int wmId = LOWORD(wParam);
@@ -190,6 +246,73 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_DESTROY:
         PostQuitMessage(0);
         break;
+	case WM_KEYDOWN:
+		switch (wParam)
+		{
+		case KEY_W:
+			g_inputState.wDown = True;
+			break;
+		case KEY_S:
+			g_inputState.sDown = True;
+			break;
+		case KEY_A:
+			g_inputState.aDown = True;
+			break;
+		case KEY_D:
+			g_inputState.dDown = True;
+			break;
+		case KEY_Q:
+			g_inputState.qDown = True;
+			break;
+		case KEY_E:
+			g_inputState.eDown = True;
+			break;
+		case VK_LSHIFT:
+			g_inputState.leftBuffonDown = True;
+			break;
+		}
+		break;
+	case WM_KEYUP:
+		switch (wParam)
+		{
+		case KEY_W:
+			g_inputState.wDown = False;
+			break;
+		case KEY_S:
+			g_inputState.sDown = False;
+			break;
+		case KEY_A:
+			g_inputState.aDown = False;
+			break;
+		case KEY_D:
+			g_inputState.dDown = False;
+			break;
+		case KEY_Q:
+			g_inputState.qDown = False;
+			break;
+		case KEY_E:
+			g_inputState.eDown = False;
+			break;
+		case VK_LSHIFT:
+			g_inputState.leftBuffonDown = False;
+			break;
+		}
+		break;
+	case WM_RBUTTONDOWN:
+		g_inputState.rightBuffonDown = True;
+		break;
+	case WM_RBUTTONUP:
+		g_inputState.rightBuffonDown = False;
+		break;
+	case WM_MOUSEMOVE:
+		g_inputState.xPos = LOWORD(lParam);
+		g_inputState.yPos = HIWORD(lParam);
+		break;
+	case WM_MOUSEWHEEL:
+		//g_inputState.zPos += (short)HIWORD(wParam);
+		break;
+	case WM_SIZE:
+		break;
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
     }
