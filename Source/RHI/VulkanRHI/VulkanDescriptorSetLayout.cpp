@@ -18,7 +18,7 @@ namespace Core
 		VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo{};
 		descriptorSetLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
 		descriptorSetLayoutCreateInfo.pBindings = m_layoutBindings.data();
-		descriptorSetLayoutCreateInfo.bindingCount = m_layoutBindings.size();
+		descriptorSetLayoutCreateInfo.bindingCount = static_cast<uint32>(m_layoutBindings.size());
 
 		VK_CHECK_RESULT(vkCreateDescriptorSetLayout(device, &descriptorSetLayoutCreateInfo, nullptr, &m_descriptorSetLayout));
 	}

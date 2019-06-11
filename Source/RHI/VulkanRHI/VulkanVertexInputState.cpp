@@ -29,9 +29,9 @@ namespace Core
 	{
 		m_pipelineVertexInputStateCreateInfo = {};
 		m_pipelineVertexInputStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-		m_pipelineVertexInputStateCreateInfo.vertexBindingDescriptionCount = m_bindingDescriptions.size();
+		m_pipelineVertexInputStateCreateInfo.vertexBindingDescriptionCount = static_cast<uint32>(m_bindingDescriptions.size());
 		m_pipelineVertexInputStateCreateInfo.pVertexBindingDescriptions = m_bindingDescriptions.data();
-		m_pipelineVertexInputStateCreateInfo.vertexAttributeDescriptionCount = m_attributeDescriptions.size();
+		m_pipelineVertexInputStateCreateInfo.vertexAttributeDescriptionCount = static_cast<uint32>(m_attributeDescriptions.size());
 		m_pipelineVertexInputStateCreateInfo.pVertexAttributeDescriptions = m_attributeDescriptions.data();
 	}
 

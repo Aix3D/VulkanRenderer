@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -28,26 +28,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -80,7 +80,7 @@
     <OutDir>$(SolutionDir)\bin\x64\Debug\</OutDir>
     <IntDir>$(SolutionDir)\bin\intermediate\x64\Debug\</IntDir>
     <IncludePath>$(SolutionDir)Include;$(SolutionDir)Source\Include;$(SolutionDir)Source\Math;$(IncludePath)</IncludePath>
-    <LibraryPath>F:\VulkanRenderer\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>E:\VulkanRenderer\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -160,11 +160,24 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Source\Asset\VulkanTexture.h" />
-    <ClInclude Include="..\Source\Component\Material.h" />
-    <ClInclude Include="..\Source\Component\RawShader.h" />
-    <ClInclude Include="..\Source\Component\StaticMesh.h" />
+    <ClInclude Include="..\Source\Asset\Entity.h" />
+    <ClInclude Include="..\Source\Asset\IAsset.h" />
+    <ClInclude Include="..\Source\Asset\Material.h" />
+    <ClInclude Include="..\Source\Asset\RawFBX.h" />
+    <ClInclude Include="..\Source\Asset\RawShader.h" />
+    <ClInclude Include="..\Source\Asset\RawTexture.h" />
+    <ClInclude Include="..\Source\Asset\World.h" />
+    <ClInclude Include="..\Source\Asset\StaticMesh.h" />
+    <ClInclude Include="..\Source\Asset\Shader.h" />
+    <ClInclude Include="..\Source\Asset\Texture.h" />
+    <ClInclude Include="..\Source\Component\CameraData.h" />
+    <ClInclude Include="..\Source\Component\GlobalRenderData.h" />
+    <ClInclude Include="..\Source\Component\IComponent.h" />
+    <ClInclude Include="..\Source\Component\InputStateData.h" />
+    <ClInclude Include="..\Source\Component\RenderableEntityData.h" />
+    <ClInclude Include="..\Source\Component\TransformData.h" />
     <ClInclude Include="..\Source\DesignPattern\Singleton.h" />
+    <ClInclude Include="..\Source\Framework\Framework.h" />
     <ClInclude Include="..\Source\Helper\AssetManager.h" />
     <ClInclude Include="..\Source\Include\BaseInclude.h" />
     <ClInclude Include="..\Source\Math\MathBase.h" />
@@ -173,14 +186,12 @@
     <ClInclude Include="..\Source\Math\Vector2.h" />
     <ClInclude Include="..\Source\Math\Vector3.h" />
     <ClInclude Include="..\Source\Math\Vector4.h" />
-    <ClInclude Include="..\Source\Object\Camera.h" />
     <ClInclude Include="..\Source\Platform\GenericPlatform.h" />
     <ClInclude Include="..\Source\Platform\Platform.h" />
     <ClInclude Include="..\Source\Platform\Windows\Resource.h" />
     <ClInclude Include="..\Source\Platform\Windows\WindowsPlatform.h" />
     <ClInclude Include="..\Source\Platform\Windows\WindowsPlatformCompilerPreSetup.h" />
-    <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanBufferManager.h" />
-    <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanBufferP.h" />
+    <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanBuffer.h" />
     <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanCommandPool.h" />
     <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanDescriptorPool.h" />
     <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanDescriptorSetLayout.h" />
@@ -191,20 +202,28 @@
     <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanPipelineLayout.h" />
     <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanShaderModule.h" />
     <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanBase.h" />
-    <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanBuffer.h" />
     <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanCommand.h" />
     <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanDevice.h" />
     <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanPipeline.h" />
     <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanRenderPass.h" />
     <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanSwapChain.h" />
     <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanVertexInputState.h" />
+    <ClInclude Include="..\Source\System\CameraSystem.h" />
+    <ClInclude Include="..\Source\System\ISystem.h" />
+    <ClInclude Include="..\Source\System\RenderSystem.h" />
     <ClInclude Include="Resource.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Source\Asset\VulkanTexture.cpp" />
-    <ClCompile Include="..\Source\Component\Material.cpp" />
-    <ClCompile Include="..\Source\Component\RawShader.cpp" />
-    <ClCompile Include="..\Source\Component\StaticMesh.cpp" />
+    <ClCompile Include="..\Source\Asset\Entity.cpp" />
+    <ClCompile Include="..\Source\Asset\Material.cpp" />
+    <ClCompile Include="..\Source\Asset\RawFBX.cpp" />
+    <ClCompile Include="..\Source\Asset\RawShader.cpp" />
+    <ClCompile Include="..\Source\Asset\RawTexture.cpp" />
+    <ClCompile Include="..\Source\Asset\World.cpp" />
+    <ClCompile Include="..\Source\Asset\StaticMesh.cpp" />
+    <ClCompile Include="..\Source\Asset\Shader.cpp" />
+    <ClCompile Include="..\Source\Asset\Texture.cpp" />
+    <ClCompile Include="..\Source\Framework\Framework.cpp" />
     <ClCompile Include="..\Source\Helper\AssetManager.cpp" />
     <ClCompile Include="..\Source\Include\BaseInclude.cpp" />
     <ClCompile Include="..\Source\Math\MathGlobal.cpp" />
@@ -212,9 +231,7 @@
     <ClCompile Include="..\Source\Math\Vector2.cpp" />
     <ClCompile Include="..\Source\Math\Vector3.cpp" />
     <ClCompile Include="..\Source\Math\Vector4.cpp" />
-    <ClCompile Include="..\Source\Object\Camera.cpp" />
-    <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanBufferManager.cpp" />
-    <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanBufferP.cpp" />
+    <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanBuffer.cpp" />
     <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanCommandPool.cpp" />
     <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanDescriptorPool.cpp" />
     <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanDescriptorSetLayout.cpp" />
@@ -225,13 +242,14 @@
     <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanPipelineLayout.cpp" />
     <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanShaderModule.cpp" />
     <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanBase.cpp" />
-    <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanBuffer.cpp" />
     <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanCommand.cpp" />
     <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanDevice.cpp" />
     <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanPipeline.cpp" />
     <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanRenderPass.cpp" />
     <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanSwapChain.cpp" />
     <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanVertexInputState.cpp" />
+    <ClCompile Include="..\Source\System\CameraSystem.cpp" />
+    <ClCompile Include="..\Source\System\RenderSystem.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>

@@ -22,9 +22,30 @@ namespace Core
 		return glm::rotate(m, angle, v);
 	}
 
-	Matrix4x4 LookAt(const Vector3 & position, const Vector3 & lookDir, const Vector3 & up)
+	Matrix3x3 Rotate(const Matrix3x3 & m, float angle, const Vector3 & v)
 	{
-		return glm::lookAt(position, lookDir, up);
+		Matrix4x4 tempMat = glm::rotate(Matrix4x4Identify, angle, v);
+
+		Matrix3x3 result;
+
+		result[0][0] = tempMat[0][0];
+		result[0][1] = tempMat[0][1];
+		result[0][2] = tempMat[0][2];
+
+		result[1][0] = tempMat[1][0];
+		result[1][1] = tempMat[1][1];
+		result[1][2] = tempMat[1][2];
+
+		result[2][0] = tempMat[2][0];
+		result[2][1] = tempMat[2][1];
+		result[2][2] = tempMat[2][2];
+
+		return result;
+	}
+
+	Matrix4x4 LookAt(const Vector3 & position, const Vector3 & center, const Vector3 & up)
+	{
+		return glm::lookAt(position, center, up);
 	}
 
 	Matrix4x4 Scale(const Matrix4x4 & m, const Vector3 & v)
@@ -155,5 +176,56 @@ namespace Core
 	int32 ToLower(float value)
 	{
 		return int32(value);
+	}
+
+	float Max(float left, float right)
+	{
+		if (left > right)
+			return left;
+		else
+			return right;
+	}
+
+	int32 Abs(int32 value)
+	{
+		if (value < 0)
+			return -value;
+		else
+			return value;
+	}
+
+	float Abs(float value)
+	{
+		if (value < 0)
+			return -value;
+		else
+			return value;
+	}
+
+	Matrix4x4 GetReflectionMatrix(Vector4 plane)
+	{
+		Matrix4x4 v_refMatrix = Matrix4x4Identify;
+
+		v_refMatrix[0][0] = (1.0f - 2.0f * plane[0] * plane[0]);
+		v_refMatrix[0][1] = (-2.0f * plane[0] * plane[1]);
+		v_refMatrix[0][2] = (-2.0f * plane[0] * plane[2]);
+		v_refMatrix[0][3] = 0;
+
+		v_refMatrix[1][0] = (-2.0f * plane[1] * plane[0]);
+		v_refMatrix[1][1] = (1.0f - 2.0f * plane[1] * plane[1]);
+		v_refMatrix[1][2] = (-2.0f * plane[1] * plane[2]);
+		v_refMatrix[1][3] = 0;
+
+		v_refMatrix[2][0] = (-2.0f * plane[2] * plane[0]);
+		v_refMatrix[2][1] = (-2.0f * plane[2] * plane[1]);
+		v_refMatrix[2][2] = (1.f - 2.0f * plane[2] * plane[2]);
+		v_refMatrix[2][3] = 0;
+
+		v_refMatrix[3][0] = (-2.0f * plane[3] * plane[0]);
+		v_refMatrix[3][1] = (-2.0f * plane[3] * plane[1]);
+		v_refMatrix[3][2] = (-2.0f * plane[3] * plane[2]);
+		v_refMatrix[3][3] = 1.0f;
+
+		return v_refMatrix;
 	}
 }

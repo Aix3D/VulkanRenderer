@@ -1,224 +1,204 @@
 #include "Texture.h"
-#include "..\Helper\TextureOperator.h"
+#include "..\RHI\VulkanRHI\VulkanGlobal.h"
 
 namespace Core
 {
-	void Texture::load()
-	{
-		if (pImage != Null)
-			delete[] pImage;
-
-		TextureOperator::LoadTexture(fullPathName.c_str(), info->format, this);
-	}
-
 	Texture::Texture()
-		:pImage(Null)
+		:m_uploadedToGPU(False)
 	{
 
 	}
 
-	void Texture::BeginUse()
+	void Texture::UploadToGPU(VulkanDevice * pDevice)
 	{
-		if (!m_beingUsed)
+		//	TODO:
+		//		可能要为所有资源添加判断重复上载到GPU的机制
+		if (m_uploadedToGPU)
+			return;
+
+		width = static_cast<uint32>(width);
+		height = static_cast<uint32>(height);
+		//	FIXME:
+		//			暂时假定只有一级mipmap
+		mipLevels = 1;
+
+		VkFormat format = VK_FORMAT_BC3_UNORM_BLOCK;
+
+		VkFormatProperties formatProperties = pDevice->GetPhysicalDeviceFormatProperties(format);
+
+		VkCommandBuffer copyCmd = pDevice->CreateCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
+
+		VkBool32 useStaging = VK_TRUE;
+
+		if (useStaging)
 		{
-			load();
-			UploadToGL();
-			UploadToRL();
-	
-			m_beingUsed = True;
+			VkBuffer stagingBuffer;
+			VkDeviceMemory stagingMemory;
+
+			VkBufferCreateInfo bufferCreateInfo{};
+			bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+			bufferCreateInfo.size = imageDataSize;
+			bufferCreateInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+			bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+			vkCreateBuffer(pDevice->GetLogicalDevice(), &bufferCreateInfo, nullptr, &stagingBuffer);
+
+			VkMemoryRequirements memoryRequirements;
+			vkGetBufferMemoryRequirements(pDevice->GetLogicalDevice(), stagingBuffer, &memoryRequirements);
+
+			VkMemoryAllocateInfo memoryAllocateInfo{};
+			memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+			memoryAllocateInfo.allocationSize = memoryRequirements.size;
+			// Get memory type index for a host visible buffer
+			memoryAllocateInfo.memoryTypeIndex = VulkanGlobal::Instance()->GetMemoryType(memoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+
+			vkAllocateMemory(pDevice->GetLogicalDevice(), &memoryAllocateInfo, nullptr, &stagingMemory);
+			vkBindBufferMemory(pDevice->GetLogicalDevice(), stagingBuffer, stagingMemory, 0);
+
+			uint8_t *data;
+			vkMapMemory(pDevice->GetLogicalDevice(), stagingMemory, 0, memoryRequirements.size, 0, (void **)&data);
+			memcpy(data, pImage.get(), imageDataSize);
+			vkUnmapMemory(pDevice->GetLogicalDevice(), stagingMemory);
+
+			ctd::vector<VkBufferImageCopy> bufferCopyRegions;
+			uint32 offset = 0;
+
+			for (uint32 i = 0; i < mipLevels; i++)
+			{
+				VkBufferImageCopy bufferCopyRegion = {};
+				bufferCopyRegion.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+				bufferCopyRegion.imageSubresource.mipLevel = i;
+				bufferCopyRegion.imageSubresource.baseArrayLayer = 0;
+				bufferCopyRegion.imageSubresource.layerCount = 1;
+				//	FIXME:
+				//			暂时假定只有一级mipmap
+				bufferCopyRegion.imageExtent.width = static_cast<uint32_t>(width);
+				bufferCopyRegion.imageExtent.height = static_cast<uint32_t>(height);
+				bufferCopyRegion.imageExtent.depth = 1;
+				bufferCopyRegion.bufferOffset = offset;
+
+				bufferCopyRegions.push_back(bufferCopyRegion);
+
+				offset += static_cast<uint32_t>(imageDataSize);
+			}
+
+			VkImageCreateInfo imageCreateInfo{};
+			imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+			imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
+			imageCreateInfo.format = format;
+			imageCreateInfo.mipLevels = mipLevels;
+			imageCreateInfo.arrayLayers = 1;
+			imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+			imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+			imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+			imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+			imageCreateInfo.extent = { width, height, 1 };
+			imageCreateInfo.usage = VK_IMAGE_USAGE_SAMPLED_BIT;
+
+			if (!(imageCreateInfo.usage & VK_IMAGE_USAGE_TRANSFER_DST_BIT))
+				imageCreateInfo.usage |= VK_IMAGE_USAGE_TRANSFER_DST_BIT;
+
+			vkCreateImage(pDevice->GetLogicalDevice(), &imageCreateInfo, nullptr, &image);
+			vkGetImageMemoryRequirements(pDevice->GetLogicalDevice(), image, &memoryRequirements);
+			memoryAllocateInfo.allocationSize = memoryRequirements.size;
+			memoryAllocateInfo.memoryTypeIndex = VulkanGlobal::Instance()->GetMemoryType(memoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+			vkAllocateMemory(pDevice->GetLogicalDevice(), &memoryAllocateInfo, nullptr, &deviceMemory);
+			vkBindImageMemory(pDevice->GetLogicalDevice(), image, deviceMemory, 0);
+
+			VkImageSubresourceRange subresourceRange = {};
+			subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+			subresourceRange.baseMipLevel = 0;
+			subresourceRange.levelCount = mipLevels;
+			subresourceRange.layerCount = 1;
+
+			pDevice->SetImageLayout(
+				copyCmd,
+				image,
+				VK_IMAGE_ASPECT_COLOR_BIT,
+				VK_IMAGE_LAYOUT_UNDEFINED,
+				VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+				subresourceRange);
+
+			vkCmdCopyBufferToImage(
+				copyCmd,
+				stagingBuffer,
+				image,
+				VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+				static_cast<uint32_t>(bufferCopyRegions.size()),
+				bufferCopyRegions.data()
+			);
+
+			imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+			pDevice->SetImageLayout(
+				copyCmd,
+				image,
+				VK_IMAGE_ASPECT_COLOR_BIT,
+				VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+				imageLayout,
+				subresourceRange);
+
+			pDevice->FlushCommandBuffer(copyCmd, true);
+
+			vkFreeMemory(pDevice->GetLogicalDevice(), stagingMemory, nullptr);
+			vkDestroyBuffer(pDevice->GetLogicalDevice(), stagingBuffer, nullptr);
 		}
-	}
-
-	void Texture::Reload()
-	{
-		load();
-		UploadToGL();
-		UploadToRL();
-	}
-
-	void Texture::BeforeSave()
-	{
-	}
-
-	void Texture::AfterLoad()
-	{
-	}
-
-	void Texture::Activate()
-	{
-		m_glTexture->Activate();
-	}
-
-	void Texture::Inactivate()
-	{
-		m_glTexture->Inactivate();
-	}
-
-	RLTexture2D * Texture::GetRLTexture()
-	{
-		return m_rlTexture.get();
-	}
-
-	void Texture::SetGLWrapMode(GLTextureWrapMode wrapMode)
-	{
-		m_glTexture->SetWrapMode(wrapMode);
-	}
-
-	Core::GLTextureWrapMode Texture::GetGLWrapMode() const
-	{
-		return m_glTexture->GetWrapMode();
-	}
-
-	void Texture::SetGLFilterMode(GLTextureFilterMode filterMode)
-	{
-		m_glTexture->SetFilterMode(filterMode);
-	}
-
-	Core::GLTextureFilterMode Texture::GetGLFilterMode() const
-	{
-		return m_glTexture->GetFilterMode();
-	}
-
-	void Texture::SetRLWrapMode(RLTextureWrapMode wrapMode)
-	{
-		m_rlTexture->SetWrapMode(wrapMode);
-	}
-
-	Core::RLTextureWrapMode Texture::GetRLWrapMode() const
-	{
-		return m_rlTexture->GetWrapMode();
-	}
-
-	void Texture::SetRLFilterMode(RLTextureFilterMode filterMode)
-	{
-		m_rlTexture->SetFilterMode(filterMode);
-	}
-
-	Core::RLTextureFilterMode Texture::GetRLFilterMode() const
-	{
-		return m_rlTexture->GetFilterMode();
-	}
-
-	void Texture::UploadToGL()
-	{
-		GLInternalFormat glInternalFormat;
-		GLPixelFormat glPixelFormat;
-
-		switch (info->format)
+		else
 		{
-		case TextureFormat_RGB24:
-			glInternalFormat = GLInternalFormat_RGB;
-			glPixelFormat = GLPixelFormat_RGB;
-			break;
-		case TextureFormat_RGBA32:
-			glInternalFormat = GLInternalFormat_RGBA;
-			glPixelFormat = GLPixelFormat_RGBA;
-			break;
-		case TextureFormat_SRGB24:
-			glInternalFormat = GLInternalFormat_SRGB8;
-			glPixelFormat = GLPixelFormat_RGB;
-			break;
-		case TextureFormat_SRGBA32:
-			glInternalFormat = GLInternalFormat_SRGB8_ALPHA8;
-			glPixelFormat = GLPixelFormat_RGBA;
-			break;
-		default:
-			assert(False);
-			break;
-		}
-
-		m_glTexture = std::make_unique<GLTexture>(GLTextureTarget_2D, glInternalFormat, glPixelFormat, GLDataType_UnsignedByte, GLTextureWrapMode_Clamp, GLTextureFilterMode_Point);
-
-		m_glTexture->LoadImage(
-			width,
-			height,
-			pImage);
-
-		switch (info->wrapMode)
-		{
-		case TextureWrapMode_Repeat:
-			SetGLWrapMode(GLTextureWrapMode_Repeat);
-			break;
-		case TextureWrapMode_Clamp:
-			SetGLWrapMode(GLTextureWrapMode_Clamp);
-			break;
-		default:
-			break;
-		}
-
-		switch (info->filterMode)
-		{
-		case TextureFilterMode_Point:
-			SetGLFilterMode(GLTextureFilterMode_Point);
-			break;
-		case TextureFilterMode_Bilinear:
-			SetGLFilterMode(GLTextureFilterMode_Bilinear);
-			break;
-		default:
-			break;
-		}
-	}
-
-	void Texture::UploadToRL()
-	{
-		RLIinternalFormat rlInternalFormat;
-		RLPixelFormat rlPixelFormat;
-
-		switch (info->format)
-		{
-		case TextureFormat_RGB24:
-			rlInternalFormat = RLIinternalFormat_RGB;
-			rlPixelFormat = RLPixelFormat_RGB;
-			break;
-		case TextureFormat_RGBA32:
-			rlInternalFormat = RLIinternalFormat_RGBA;
-			rlPixelFormat = RLPixelFormat_RGBA;
-			break;
-		case TextureFormat_SRGB24:
-			rlInternalFormat = RLIinternalFormat_RGB;
-			rlPixelFormat = RLPixelFormat_RGB;
-			break;
-		case TextureFormat_SRGBA32:
-			rlInternalFormat = RLIinternalFormat_RGBA;
-			rlPixelFormat = RLPixelFormat_RGBA;
-			break;
-		default:
-			assert(False);
-			break;
+			//	TODO:
 		}
 
-		m_rlTexture = std::make_unique<RLTexture2D>(rlInternalFormat, rlPixelFormat, RLDataType_UnsignedByte, RLTextureWrapMode_Clamp, RLTextureFilterMode_Point);
+		// Create a defaultsampler
+		VkSamplerCreateInfo samplerCreateInfo = {};
+		samplerCreateInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+		samplerCreateInfo.magFilter = VK_FILTER_LINEAR;
+		samplerCreateInfo.minFilter = VK_FILTER_LINEAR;
+		samplerCreateInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+		samplerCreateInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+		samplerCreateInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+		samplerCreateInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+		samplerCreateInfo.mipLodBias = 0.0f;
+		samplerCreateInfo.compareOp = VK_COMPARE_OP_NEVER;
+		samplerCreateInfo.minLod = 0.0f;
+		// Max level-of-detail should match mip level count
+		samplerCreateInfo.maxLod = (useStaging) ? (float)mipLevels : 0.0f;
+		// Enable anisotropic filtering
+		samplerCreateInfo.maxAnisotropy = 1;
+		samplerCreateInfo.anisotropyEnable = VK_FALSE;
+		samplerCreateInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
+		vkCreateSampler(pDevice->GetLogicalDevice(), &samplerCreateInfo, nullptr, &sampler);
 
-		m_rlTexture->LoadImage(width, height, pImage);
+		VkImageViewCreateInfo viewCreateInfo = {};
+		viewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+		viewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+		viewCreateInfo.format = format;
+		viewCreateInfo.components = { VK_COMPONENT_SWIZZLE_R, VK_COMPONENT_SWIZZLE_G, VK_COMPONENT_SWIZZLE_B, VK_COMPONENT_SWIZZLE_A };
+		viewCreateInfo.subresourceRange = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 };
+		// Linear tiling usually won't support mip maps
+		// Only set mip map count if optimal tiling is used
+		viewCreateInfo.subresourceRange.levelCount = (useStaging) ? mipLevels : 1;
+		viewCreateInfo.image = image;
+		vkCreateImageView(pDevice->GetLogicalDevice(), &viewCreateInfo, nullptr, &view);
 
-		switch (info->wrapMode)
-		{
-		case TextureWrapMode_Repeat:
-			SetRLWrapMode(RLTextureWrapMode_Repeat);
-			break;
-		case TextureWrapMode_Clamp:
-			SetRLWrapMode(RLTextureWrapMode_Clamp);
-			break;
-		default:
-			break;
-		}
+		descriptor.sampler = sampler;
+		descriptor.imageView = view;
+		descriptor.imageLayout = imageLayout;
 
-		switch (info->filterMode)
-		{
-		case TextureFilterMode_Point:
-			SetRLFilterMode(RLTextureFilterMode_Point);
-			break;
-		case TextureFilterMode_Bilinear:
-			SetRLFilterMode(RLTextureFilterMode_Bilinear);
-			break;
-		default:
-			break;
-		}
+		m_uploadedToGPU = True;
+	}
+
+	void Texture::OnPause()
+	{
+
+	}
+
+	void Texture::OnResume()
+	{
+
 	}
 
 	Texture::~Texture()
 	{
-		if (pImage)
-			delete[] pImage;
+
 	}
 }

@@ -85,7 +85,7 @@ namespace Core
 		VkPipelineDynamicStateCreateInfo pipelineDynamicStateCreateInfo{};
 		pipelineDynamicStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
 		pipelineDynamicStateCreateInfo.pDynamicStates = dynamicStateEnables.data();
-		pipelineDynamicStateCreateInfo.dynamicStateCount = dynamicStateEnables.size();
+		pipelineDynamicStateCreateInfo.dynamicStateCount = static_cast<uint32>(dynamicStateEnables.size());
 		pipelineDynamicStateCreateInfo.flags = 0;
 
 		// Solid rendering pipeline
@@ -107,7 +107,7 @@ namespace Core
 		pipelineCreateInfo.pViewportState = &pipelineViewportStateCreateInfo;
 		pipelineCreateInfo.pDepthStencilState = &pipelineDepthStencilStateCreateInfo;
 		pipelineCreateInfo.pDynamicState = &pipelineDynamicStateCreateInfo;
-		pipelineCreateInfo.stageCount = m_shaderStageCreateInfos.size();
+		pipelineCreateInfo.stageCount =  static_cast<uint32>(m_shaderStageCreateInfos.size());
 		pipelineCreateInfo.pStages = m_shaderStageCreateInfos.data();
 
 		if (!pipelineCacheCreated)

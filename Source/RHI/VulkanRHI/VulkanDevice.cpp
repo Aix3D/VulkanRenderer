@@ -315,8 +315,6 @@ namespace Core
 
 		VK_CHECK_RESULT(vkCreateDevice(m_physicalDevice, &deviceCreateInfo, nullptr, &m_logicalDevice));
 
-		m_pBufferManager = std::make_unique<VulkanBufferManager>(m_logicalDevice, m_deviceMemoryProperties);
-
 		vkGetDeviceQueue(m_logicalDevice, m_graphicsQueueFamilyIndex, 0, &m_queue);
 
 		VkCommandPoolCreateInfo cmdPoolCreateInfo = {};
@@ -344,16 +342,12 @@ namespace Core
 		m_validation = True;
 	}
 
-	Core::ErrorCode VulkanDevice::Initialize(std::shared_ptr<RawShader> pVertexShader, std::shared_ptr<RawShader> pFragmentShader, void* platformHandle, void* platformWindow)
+	Core::ErrorCode VulkanDevice::Initialize(void* platformHandle, void* platformWindow)
 	{
-		m_pVertexShaderData = pVertexShader;
-		m_pFragmentShaderData = pFragmentShader;
-
 		createVKInstance();
 
 		if (m_validation)
 		{
-			//	TODO:	implement later.
 			m_PFN_createDebugReportCallback = reinterpret_cast<PFN_vkCreateDebugReportCallbackEXT>(vkGetInstanceProcAddr(m_instance, "vkCreateDebugReportCallbackEXT"));
 			m_PFN_destroyDebugReportCallback = reinterpret_cast<PFN_vkDestroyDebugReportCallbackEXT>(vkGetInstanceProcAddr(m_instance, "vkDestroyDebugReportCallbackEXT"));
 			m_PFN_dbgBreakCallback = reinterpret_cast<PFN_vkDebugReportMessageEXT>(vkGetInstanceProcAddr(m_instance, "vkDebugReportMessageEXT"));
@@ -399,14 +393,12 @@ namespace Core
 			}
 		}
 
-
 		initializeLogicalDevice(platformHandle, platformWindow);
-
 
 		return ErrorCode_OK;
 	}
 
-	void VulkanDevice::PrepareSTH(VkDescriptorImageInfo imageInfo)
+	void VulkanDevice::PrepareSTH()
 	{
 		VkSemaphoreCreateInfo semaphoreCreateInfo{};
 		semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
@@ -471,54 +463,51 @@ namespace Core
 			VK_CHECK_RESULT(vkCreateFramebuffer(m_logicalDevice, &frameBufferCreateInfo, nullptr, &m_frameBuffers[i]));
 		}
 
-		//setupVertexDescriptions();
+		//m_inputState.PushBindingDescription(0, sizeof(Vertex), VK_VERTEX_INPUT_RATE_VERTEX);
+		//m_inputState.PushAttributeDescription(0, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, position));
+		//m_inputState.PushAttributeDescription(0, 1, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, normal));
+		//m_inputState.PushAttributeDescription(0, 2, VK_FORMAT_R32G32_SFLOAT, offsetof(Vertex, uv0));
+		//m_inputState.PushAttributeDescription(0, 3, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, color));
+		//m_inputState.Build(m_logicalDevice);
 
-		m_inputState.PushBindingDescription(0, sizeof(VertexP), VK_VERTEX_INPUT_RATE_VERTEX);
-		m_inputState.PushAttributeDescription(0, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(VertexP, position));
-		m_inputState.PushAttributeDescription(0, 1, VK_FORMAT_R32G32B32_SFLOAT, offsetof(VertexP, normal));
-		m_inputState.PushAttributeDescription(0, 2, VK_FORMAT_R32G32_SFLOAT, offsetof(VertexP, uv0));
-		m_inputState.PushAttributeDescription(0, 3, VK_FORMAT_R32G32B32_SFLOAT, offsetof(VertexP, color));
-		m_inputState.Build(m_logicalDevice);
+		//m_pUniformBuffer = m_pBufferManager->CreateBuffer(
+		//	VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+		//	VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+		//	sizeof(uboVS));
 
-		m_pUniformBuffer = m_pBufferManager->CreateBuffer(
-			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-			sizeof(uboVS));
+		//m_pUniformBuffer.lock()->SetDescriptorBufferInfo();
 
-		m_pUniformBuffer.lock()->SetDescriptorBufferInfo();
+		//uboVS.projection = Perspective(90.0f * Deg2Rad, (float)m_width / (float)m_height, 0.1f, 256.0f);
+		//uboVS.model = Translate(Matrix4x4Identify, Vector3(0.0f, 0.0f, -8.0f));
 
-		uboVS.projection = Perspective(90.0f * Deg2Rad, (float)m_width / (float)m_height, 0.1f, 256.0f);
-		uboVS.model = Translate(Matrix4x4Identify, Vector3(0.0f, 0.0f, -8.0f));
+		//m_pUniformBuffer.lock()->Map(m_logicalDevice, 0, sizeof(uboVS));
 
-		m_pUniformBuffer.lock()->Map(m_logicalDevice, 0, sizeof(uboVS));
+		//memcpy(m_pUniformBuffer.lock()->mapped, &uboVS, sizeof(uboVS));
 
-		memcpy(m_pUniformBuffer.lock()->mapped, &uboVS, sizeof(uboVS));
+		//m_pUniformBuffer.lock()->Unmap(m_logicalDevice, sizeof(uboVS));
 
-		m_pUniformBuffer.lock()->Unmap(m_logicalDevice, sizeof(uboVS));
+		//m_descriptorPool.PushPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1);
+		//m_descriptorPool.PushPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1);
+		//m_descriptorPool.Build(m_logicalDevice);
 
-		m_descriptorPool.PushPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1);
-		m_descriptorPool.PushPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1);
-		m_descriptorPool.Build(m_logicalDevice);
+		//m_descriptorSetLayout.PushLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 0, 1);
+		//m_descriptorSetLayout.PushLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 1, 1);
+		//m_descriptorSetLayout.Build(m_logicalDevice);
 
-		m_descriptorSetLayout.PushLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 0, 1);
-		m_descriptorSetLayout.PushLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 1, 1);
-		m_descriptorSetLayout.Build(m_logicalDevice);
+		//m_pipelineLayout.PushDescriptorSetLayout(m_descriptorSetLayout);
+		//m_pipelineLayout.Build(m_logicalDevice);
 
-		vector<VkDescriptorSetLayout> descriptorSetLayoutHandles;
-		descriptorSetLayoutHandles.push_back(m_descriptorSetLayout.GetHandle());
+		//m_pipeline.PushShader(m_logicalDevice, VK_SHADER_STAGE_VERTEX_BIT, m_pVertexShaderData.lock()->pRawData.get(), m_pVertexShaderData.lock()->size);
+		//m_pipeline.PushShader(m_logicalDevice, VK_SHADER_STAGE_FRAGMENT_BIT, *m_pFragmentShaderData.lock()->pRawData, m_pFragmentShaderData.lock()->size);
 
-		m_pipelineLayout.Build(m_logicalDevice, descriptorSetLayoutHandles);
-
-		m_pipeline.PushShader(m_logicalDevice, VK_SHADER_STAGE_VERTEX_BIT, *m_pVertexShaderData.lock()->pRawData, m_pVertexShaderData.lock()->size);
-		m_pipeline.PushShader(m_logicalDevice, VK_SHADER_STAGE_FRAGMENT_BIT, *m_pFragmentShaderData.lock()->pRawData, m_pFragmentShaderData.lock()->size);
-
-		m_pipeline.Build(m_logicalDevice, m_inputState, m_pipelineLayout, m_renderPass);
-
-		m_descriptorSet.SetDescriptorSetLayout(m_descriptorSetLayout.GetHandle());
-		m_descriptorSet.PushDescriptorInfo(m_pUniformBuffer.lock()->descriptorBufferInfo);
-		m_descriptorSet.PushDescriptorInfo(imageInfo);
+		//m_pipeline.Build(m_logicalDevice, m_inputState, m_pipelineLayout, m_renderPass);
 		
-		m_descriptorSet.Build(m_logicalDevice, m_descriptorPool.GetHandle());
+
+		//m_descriptorSet.SetDescriptorSetLayout(m_descriptorSetLayout.GetHandle());
+		//m_descriptorSet.PushDescriptorInfo(m_pUniformBuffer.lock()->descriptorBufferInfo);
+		//m_descriptorSet.PushDescriptorInfo(imageInfo);
+		//
+		//m_descriptorSet.Build(m_logicalDevice, m_descriptorPool.GetHandle());
 	}
 
 	void VulkanDevice::Draw()
@@ -578,6 +567,31 @@ namespace Core
 
 		// Attach the memory to the buffer object
 		VK_CHECK_RESULT(vkBindBufferMemory(m_logicalDevice, *buffer, *memory, 0));
+	}
+
+	std::unique_ptr<Core::VulkanBuffer> VulkanDevice::CreateBuffer(VkBufferUsageFlags usageFlags, VkMemoryPropertyFlags memoryPropertyFlags, VkDeviceSize size)
+	{
+		std::unique_ptr<VulkanBuffer> pBuffer = std::make_unique<VulkanBuffer>();
+
+		VkBufferCreateInfo bufferCreateInfo{};
+		bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+		bufferCreateInfo.usage = usageFlags;
+		bufferCreateInfo.size = size;
+		bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+		VK_CHECK_RESULT(vkCreateBuffer(m_logicalDevice, &bufferCreateInfo, nullptr, &pBuffer->buffer));
+
+		VkMemoryRequirements memoryRequirements;
+		vkGetBufferMemoryRequirements(m_logicalDevice, pBuffer->buffer, &memoryRequirements);
+
+		VkMemoryAllocateInfo memoryAllocateInfo{};
+		memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+		memoryAllocateInfo.allocationSize = memoryRequirements.size;
+		memoryAllocateInfo.memoryTypeIndex = getMemoryType(memoryRequirements.memoryTypeBits, memoryPropertyFlags);
+		VK_CHECK_RESULT(vkAllocateMemory(m_logicalDevice, &memoryAllocateInfo, nullptr, &pBuffer->memory));
+
+		pBuffer->memoryPropertyFlags = memoryPropertyFlags;
+
+		return pBuffer;
 	}
 
 	VkCommandBuffer VulkanDevice::CreateCommandBuffer(VkCommandBufferLevel level, bool begin)
@@ -663,9 +677,12 @@ namespace Core
 
 			vkCmdBeginRenderPass(m_drawCommandBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
+			//	Flipping the viewport
 			VkViewport viewport{};
 			viewport.width = static_cast<float>(m_width);
-			viewport.height = static_cast<float>(m_height);
+			viewport.height = -static_cast<float>(m_height);
+			viewport.x = 0;
+			viewport.y = static_cast<float>(m_height);
 			viewport.minDepth = 0;
 			viewport.maxDepth = 1.0;
 
@@ -679,9 +696,9 @@ namespace Core
 
 			vkCmdSetScissor(m_drawCommandBuffers[i], 0, 1, &scissor);
 
-			VkDescriptorSet temp = m_descriptorSet.GetHandle();
-			vkCmdBindDescriptorSets(m_drawCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout.GetPipelineLayoutHandle(), 0, 1, &temp, 0, NULL);
-			vkCmdBindPipeline(m_drawCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline.GetHandle());
+			//VkDescriptorSet temp = m_descriptorSet.GetHandle();
+			//vkCmdBindDescriptorSets(m_drawCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout.GetPipelineLayoutHandle(), 0, 1, &temp, 0, NULL);
+			//vkCmdBindPipeline(m_drawCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline.GetHandle());
 
 			//VkDeviceSize offsets[1] = { 0 };
 
@@ -705,18 +722,18 @@ namespace Core
 		}
 	}
 
-	void VulkanDevice::UpdateCamera(Camera camera)
-	{		
-		uboVS.model = camera.m_viewMatrix;
-		uboVS.projection = camera.m_perspectiveMatrix;
-
-		if (!m_pUniformBuffer.lock()->mapped)
-			m_pUniformBuffer.lock()->Map(m_logicalDevice, 0, sizeof(uboVS));
-
-		memcpy(m_pUniformBuffer.lock()->mapped, &uboVS, sizeof(uboVS));
-
-		//m_pUniformBuffer.lock()->Unmap(m_logicalDevice, sizeof(uboVS));
-	}
+	//void VulkanDevice::UpdateCamera(Camera camera)
+	//{		
+	//	uboVS.model = camera.m_viewMatrix;
+	//	uboVS.projection = camera.m_perspectiveMatrix;
+	//
+	//	if (!m_pUniformBuffer.lock()->mapped)
+	//		m_pUniformBuffer.lock()->Map(m_logicalDevice, 0, sizeof(uboVS));
+	//
+	//	memcpy(m_pUniformBuffer.lock()->mapped, &uboVS, sizeof(uboVS));
+	//
+	//	//m_pUniformBuffer.lock()->Unmap(m_logicalDevice, sizeof(uboVS));
+	//}
 
 	VkFormatProperties VulkanDevice::GetPhysicalDeviceFormatProperties(VkFormat format) const
 	{
@@ -726,9 +743,14 @@ namespace Core
 		return formatProperties;
 	}
 
-	VkDevice VulkanDevice::GetLogicalDevice()
+	VkDevice VulkanDevice::GetLogicalDevice() const
 	{
 		return m_logicalDevice;
+	}
+
+	Core::VulkanRenderPass VulkanDevice::GetDefaultRenderPass() const
+	{
+		return m_renderPass;
 	}
 
 	void VulkanDevice::SetImageLayout(VkCommandBuffer cmdbuffer, VkImage image, VkImageAspectFlags aspectMask, VkImageLayout oldImageLayout, VkImageLayout newImageLayout, VkImageSubresourceRange subresourceRange, VkPipelineStageFlags srcStageMask /*= VK_PIPELINE_STAGE_ALL_COMMANDS_BIT*/, VkPipelineStageFlags dstStageMask /*= VK_PIPELINE_STAGE_ALL_COMMANDS_BIT*/)

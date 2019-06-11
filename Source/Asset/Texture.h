@@ -1,46 +1,32 @@
 #pragma once
-#include <BaseInclude.h>
 #include "IAsset.h"
-#include "TextureInfo.h"
-#include "..\RHI\OpenGLRHI\GLTexture.h"
-#include "..\RHI\OpenRLRHI\RLTexture2D.h"
-#include "..\DesignPattern\ObserverPattern\Subject.h"
+#include <gli\texture2d.hpp>
+#include "..\RHI\VulkanRHI\VulkanDevice.h"
 
 namespace Core
 {
-	class Texture : public IAsset, public Subject
+	class Texture : public IAsset
 	{
 	private:
-		std::unique_ptr<GLTexture> m_glTexture;
-		std::unique_ptr<RLTexture2D> m_rlTexture;
+		VkImage image;
+		VkDeviceMemory deviceMemory;
+		VkImageLayout imageLayout;
+		VkSampler sampler;
+		VkImageView view;
+		Bool m_uploadedToGPU;
 		
-		void load();
-
 	public:
-		std::shared_ptr<TextureInfo> info;
-		int32 width;
-		int32 height;
-		void * pImage;
+		std::unique_ptr<uint8[]> pImage;
+		uint32 imageDataSize;
+		uint32 width;
+		uint32 height;
+		uint32 mipLevels;
+		VkDescriptorImageInfo descriptor;
 
 		Texture();
-
-		virtual void BeginUse() override;
-		virtual void Reload() override;
-		virtual void BeforeSave() override;
-		virtual void AfterLoad() override;
-		void Activate();
-		void Inactivate();
-		RLTexture2D * GetRLTexture();
-		void SetGLWrapMode(GLTextureWrapMode wrapMode);
-		GLTextureWrapMode GetGLWrapMode() const;
-		void SetGLFilterMode(GLTextureFilterMode filterMode);
-		GLTextureFilterMode GetGLFilterMode() const;
-		void SetRLWrapMode(RLTextureWrapMode wrapMode);
-		RLTextureWrapMode GetRLWrapMode() const;
-		void SetRLFilterMode(RLTextureFilterMode filterMode);
-		RLTextureFilterMode GetRLFilterMode() const;
-		void UploadToGL();
-		void UploadToRL();
+		void UploadToGPU(VulkanDevice * pDevice);
+		virtual void OnPause() override;
+		virtual void OnResume() override;
 		virtual ~Texture();
 	};
 }

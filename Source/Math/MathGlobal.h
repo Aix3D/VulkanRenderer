@@ -1,8 +1,9 @@
 #pragma once
 #include "MathBase.h"
-#include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective 
+#include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
 #include <glm/gtc/constants.hpp>
 #include "Matrix4x4.h"
+#include "Matrix3x3.h"
 #include "Vector3.h"
 #include "Vector2.h"
 
@@ -22,7 +23,9 @@ namespace Core
 
 	Matrix4x4 Rotate(const Matrix4x4 & m, float angle, const Vector3 & v);
 
-	Matrix4x4 LookAt(const Vector3 & position, const Vector3 & lookDir, const Vector3 & up);
+	Matrix3x3 Rotate(const Matrix3x3 & m, float angle, const Vector3 & v);
+
+	Matrix4x4 LookAt(const Vector3 & position, const Vector3 & center, const Vector3 & up);
 
 	Matrix4x4 Scale(const Matrix4x4 & m, const Vector3 & v);
 
@@ -46,7 +49,7 @@ namespace Core
 	//	弧度转角度
 	const float Rad2Deg = 57.2957795f;
 
-	//	角度转弧度	
+	//	角度转弧度
 	const float Deg2Rad = 0.0174532925f;
 
 	const Vector3 Up = Vector3(0, 1.0f, 0);
@@ -68,6 +71,11 @@ namespace Core
 		0, 0, 1.0f, 0,
 		0, 0, 0, 1.0f);
 
+	const Matrix3x3 Matrix3x3Identify = Matrix3x3(
+		1.0f, 0, 0,
+		0, 1.0f, 0,
+		0, 0, 1.0f);
+
 	const Vector3 Vector3Dummy = Vector3(0, 0, 0);
 
 	const Vector4 Vector4Dummy = Vector4(0, 0, 0, 0);
@@ -86,4 +94,11 @@ namespace Core
 
 	int32 ToUpper(float value);
 	int32 ToLower(float value);
+
+	float Max(float left, float right);
+
+	int32 Abs(int32 value);
+	float Abs(float value);
+
+	Matrix4x4 GetReflectionMatrix(Vector4 plane);
 }

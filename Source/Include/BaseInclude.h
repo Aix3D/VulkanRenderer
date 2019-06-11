@@ -37,28 +37,6 @@ namespace Core
 	//	´íÎó´úÂë,ÎÞ´íÎó.
 	extern ErrorCode ErrorCode_OK;
 
-	struct InputState
-	{
-		Bool inlvaid = False;
-
-		//	KeyboardState
-		Bool wDown = False;
-		Bool sDown = False;
-		Bool aDown = False;
-		Bool dDown = False;
-		Bool qDown = False;
-		Bool eDown = False;
-		Bool leftShiftDown = False;
-		
-		//	MouseState
-		Bool leftBuffonDown = False;
-		Bool middleBuffonDown = False;
-		Bool rightBuffonDown = False;
-		uint32 xPos = 0;
-		uint32 yPos = 0;
-		uint32 zPos = 1;
-	};
-
 	struct WindowsState
 	{
 		int32 xPos = 0;

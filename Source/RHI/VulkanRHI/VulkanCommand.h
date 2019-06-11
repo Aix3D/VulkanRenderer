@@ -6,7 +6,9 @@ namespace Core
 {
 	enum CommandType
 	{
-		CommandType_BindVertexBuffer = 0,
+		CommandType_BindDescriptorSets = 0,
+		CommandType_BindPipeline,
+		CommandType_BindVertexBuffer,
 		CommandType_BindIndexBuffer,
 		CommandType_DrawIndexed,
 		CommandType_Count,
@@ -22,6 +24,45 @@ namespace Core
 		CommandType GetCommandType();
 		uint32 GetCommandID();
 		virtual void Excute(VkCommandBuffer commandBuffer) = 0;
+	};
+
+	class BindDescriptorSets : public Command
+	{
+	private:
+		VkPipelineBindPoint pipelineBindPoint;
+		VkPipelineLayout pipelineLayout;
+		uint32_t firstSet;
+		uint32_t descriptorSetCount;
+		VkDescriptorSet descriptorSets;
+		uint32_t dynamicOffsetCount;
+		const uint32_t* pDynamicOffsets;
+
+	public:
+		BindDescriptorSets(
+			VkPipelineBindPoint pipelineBindPoint,
+			VkPipelineLayout pipelineLayout,
+			uint32_t firstSet,
+			uint32_t descriptorSetCount,
+			VkDescriptorSet descriptorSet,
+			uint32_t dynamicOffsetCount,
+			const uint32_t* pDynamicOffsets
+			);
+		virtual void Excute(VkCommandBuffer commandBuffer) override;
+		virtual ~BindDescriptorSets() {};
+	};
+
+	class BindPipeline : public Command
+	{
+	private:
+		VkPipelineBindPoint pipelineBindPoint;
+		VkPipeline pipeline;
+	public:
+		BindPipeline(
+			VkPipelineBindPoint pipelineBindPoint,
+			VkPipeline pipeline
+		);
+		virtual void Excute(VkCommandBuffer commandBuffer) override;
+		virtual ~BindPipeline() {};
 	};
 
 	class BindVertexBuffers : public Command

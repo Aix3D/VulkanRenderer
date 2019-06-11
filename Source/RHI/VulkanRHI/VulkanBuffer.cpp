@@ -2,75 +2,44 @@
 
 namespace Core
 {
-	VkResult VulkanBuffer::map(VkDeviceSize size /*= VK_WHOLE_SIZE*/, VkDeviceSize offset /*= 0*/)
+	VulkanBuffer::VulkanBuffer()
+		:mapped(Null)
 	{
-		return vkMapMemory(device, memory, offset, size, 0, &mapped);
+
 	}
 
-	void VulkanBuffer::unmap()
+	void VulkanBuffer::Map(VkDevice device, VkDeviceSize offset, VkDeviceSize size)
 	{
-		if (mapped)
+		VK_CHECK_RESULT(vkMapMemory(device, memory, offset, size, 0, &mapped));
+	}
+
+	void VulkanBuffer::Unmap(VkDevice device, VkDeviceSize size)
+	{
+		if ((memoryPropertyFlags & VK_MEMORY_PROPERTY_HOST_COHERENT_BIT) == 0)
 		{
-			vkUnmapMemory(device, memory);
-			mapped = nullptr;
+			VkMappedMemoryRange mappedRange{};
+			mappedRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
+
+			mappedRange.memory = memory;
+			mappedRange.offset = 0;
+			mappedRange.size = size;
+			vkFlushMappedMemoryRanges(device, 1, &mappedRange);
 		}
+
+		vkUnmapMemory(device, memory);
+
+		VK_CHECK_RESULT(vkBindBufferMemory(device, buffer, memory, 0));
 	}
 
-	VkResult VulkanBuffer::bind(VkDeviceSize offset /*= 0*/)
+	void VulkanBuffer::SetDescriptorBufferInfo()
 	{
-		return vkBindBufferMemory(device, buffer, memory, offset);
+		descriptorBufferInfo.offset = 0;
+		descriptorBufferInfo.range = VK_WHOLE_SIZE;
+		descriptorBufferInfo.buffer = buffer;
 	}
 
-	void VulkanBuffer::setupDescriptor(VkDeviceSize size /*= VK_WHOLE_SIZE*/, VkDeviceSize offset /*= 0*/)
+	VulkanBuffer::~VulkanBuffer()
 	{
-		descriptor.offset = offset;
-		descriptor.buffer = buffer;
-		descriptor.range = size;
+
 	}
-
-	void VulkanBuffer::copyTo(void* data, VkDeviceSize size)
-	{
-		assert(mapped);
-		memcpy(mapped, data, size);
-	}
-
-	VkResult VulkanBuffer::flush(VkDeviceSize size /*= VK_WHOLE_SIZE*/, VkDeviceSize offset /*= 0*/)
-	{
-		VkMappedMemoryRange mappedRange = {};
-		mappedRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
-		mappedRange.memory = memory;
-		mappedRange.offset = offset;
-		mappedRange.size = size;
-		return vkFlushMappedMemoryRanges(device, 1, &mappedRange);
-	}
-
-	VkResult VulkanBuffer::invalidate(VkDeviceSize size /*= VK_WHOLE_SIZE*/, VkDeviceSize offset /*= 0*/)
-	{
-		VkMappedMemoryRange mappedRange = {};
-		mappedRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
-		mappedRange.memory = memory;
-		mappedRange.offset = offset;
-		mappedRange.size = size;
-		return vkInvalidateMappedMemoryRanges(device, 1, &mappedRange);
-	}
-
-	void VulkanBuffer::destroy()
-	{
-		return;
-
-		if (buffer)
-		{
-			vkDestroyBuffer(device, buffer, nullptr);
-		}
-		if (memory)
-		{
-			vkFreeMemory(device, memory, nullptr);
-		}
-	}
-
-	VkBuffer VulkanBuffer::GetBuffer() const
-	{
-		return buffer;
-	}
-
 }

@@ -12,6 +12,44 @@ namespace Core
 		return m_commandID;
 	}
 
+	BindDescriptorSets::BindDescriptorSets(
+		VkPipelineBindPoint pipelineBindPoint,
+		VkPipelineLayout pipelineLayout,
+		uint32_t firstSet,
+		uint32_t descriptorSetCount,
+		VkDescriptorSet descriptorSet,
+		uint32_t dynamicOffsetCount,
+		const uint32_t* pDynamicOffsets)
+	{
+		this->pipelineBindPoint = pipelineBindPoint;
+		this->pipelineLayout = pipelineLayout;
+		this->firstSet = firstSet;
+		this->descriptorSetCount = descriptorSetCount;
+		this->descriptorSets = descriptorSet;
+		this->dynamicOffsetCount = dynamicOffsetCount;
+		this->pDynamicOffsets = pDynamicOffsets;
+	}
+
+	void BindDescriptorSets::Excute(VkCommandBuffer commandBuffer)
+	{
+		vkCmdBindDescriptorSets(commandBuffer, pipelineBindPoint, pipelineLayout, firstSet, descriptorSetCount, &descriptorSets, dynamicOffsetCount, pDynamicOffsets);
+	}
+
+	BindPipeline::BindPipeline(VkPipelineBindPoint pipelineBindPoint, VkPipeline pipeline)
+	{
+		this->pipelineBindPoint = pipelineBindPoint;
+		this->pipeline = pipeline;
+	}
+
+	void BindPipeline::Excute(VkCommandBuffer commandBuffer)
+	{
+		vkCmdBindPipeline(
+			commandBuffer,
+			pipelineBindPoint,
+			pipeline
+		);
+	}
+
 	BindVertexBuffers::BindVertexBuffers(uint32_t firstBinding, uint32_t bindingCount, const VkBuffer* pBuffers, const VkDeviceSize* pOffsets)
 	{
 		this->firstBinding = firstBinding;

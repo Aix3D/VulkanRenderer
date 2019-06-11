@@ -18,8 +18,9 @@
 #include <../RHI/VulkanRHI/VulkanDevice.h>
 #include "../Source/Helper/AssetManager.h"
 #include "../Source/RHI/VulkanRHI/VulkanCommand.h"
-#include "../Source/Component/RawShader.h"
-#include "../Source/Object/Camera.h"
+#include "../Source/Framework/Framework.h"
+#include "../Source/Component/InputStateData.h"
+#include "../Source/Math/MathGlobal.h"
 
 #define MAX_LOADSTRING 100
 
@@ -48,7 +49,7 @@ INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 void SetupConsole(std::string title);
 
 HWND g_window;
-Core::InputState g_inputState;
+Core::Framework g_frameWork;
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -83,23 +84,22 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	lastTime.HighPart = 0;
 	LARGE_INTEGER currentTime;
 
-	std::shared_ptr<Core::AssetManager> assetManager = std::make_shared<Core::AssetManager>();
-	
-	std::shared_ptr<Core::RawShader> pVertexShader = assetManager->LoadRawShader("mesh.vert.spv");
-	std::shared_ptr<Core::RawShader> pFragmentShader = assetManager->LoadRawShader("mesh.frag.spv");
-
 	std::unique_ptr<Core::VulkanDevice> vulkanDevice = std::make_unique<Core::VulkanDevice>();
-	vulkanDevice->Initialize(pVertexShader, pFragmentShader, hInstance, g_window);
-	assetManager->LoadFBX("sibenik.dae");// voyager.dae");// "cube.fbx");
-	
-	assetManager->UploadToGPU(vulkanDevice.get());
-	vulkanDevice->PrepareSTH(assetManager->GetAnyTexture()->descriptor);
+	vulkanDevice->Initialize(hInstance, g_window);
+	vulkanDevice->PrepareSTH();
 
-	assetManager->CommitToDrawList(vulkanDevice.get());
+	std::shared_ptr<Core::AssetManager> assetManager = std::make_shared<Core::AssetManager>();
+	assetManager->Scan();
+
+	g_frameWork.SetCurrentWorld(assetManager->GetDefaultWorld());
+	g_frameWork.Initialize(vulkanDevice.get(), 1.0f * width / height);
+
+	//assetManager->UploadToGPU(vulkanDevice.get());
+	//vulkanDevice->PrepareSTH();
+
+	//assetManager->CommitToDrawList(vulkanDevice.get());
 
 	vulkanDevice->BuildCommandBuffers();
-
-	Core::Camera camera{ width , height };
 
 	MSG msg = { 0 };
 
@@ -127,9 +127,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 				lastTime = currentTime;
 			}
 
-			camera.Tick(elasped, g_inputState);
-			vulkanDevice->UpdateCamera(camera);
+			g_frameWork.Tick(elasped, vulkanDevice.get(), Core::InputStateData::Instance());
+
 			vulkanDevice->Draw();
+
+			Core::InputStateData::Instance()->mouseIsMoveing = False;
 		}
 	}
 
@@ -250,25 +252,25 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		switch (wParam)
 		{
 		case KEY_W:
-			g_inputState.wDown = True;
+			Core::InputStateData::Instance()->wDown = True;
 			break;
 		case KEY_S:
-			g_inputState.sDown = True;
+			Core::InputStateData::Instance()->sDown = True;
 			break;
 		case KEY_A:
-			g_inputState.aDown = True;
+			Core::InputStateData::Instance()->aDown = True;
 			break;
 		case KEY_D:
-			g_inputState.dDown = True;
+			Core::InputStateData::Instance()->dDown = True;
 			break;
 		case KEY_Q:
-			g_inputState.qDown = True;
+			Core::InputStateData::Instance()->qDown = True;
 			break;
 		case KEY_E:
-			g_inputState.eDown = True;
+			Core::InputStateData::Instance()->eDown = True;
 			break;
 		case VK_LSHIFT:
-			g_inputState.leftBuffonDown = True;
+			Core::InputStateData::Instance()->leftShiftDown = True;
 			break;
 		}
 		break;
@@ -276,40 +278,48 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		switch (wParam)
 		{
 		case KEY_W:
-			g_inputState.wDown = False;
+			Core::InputStateData::Instance()->wDown = False;
 			break;
 		case KEY_S:
-			g_inputState.sDown = False;
+			Core::InputStateData::Instance()->sDown = False;
 			break;
 		case KEY_A:
-			g_inputState.aDown = False;
+			Core::InputStateData::Instance()->aDown = False;
 			break;
 		case KEY_D:
-			g_inputState.dDown = False;
+			Core::InputStateData::Instance()->dDown = False;
 			break;
 		case KEY_Q:
-			g_inputState.qDown = False;
+			Core::InputStateData::Instance()->qDown = False;
 			break;
 		case KEY_E:
-			g_inputState.eDown = False;
+			Core::InputStateData::Instance()->eDown = False;
 			break;
 		case VK_LSHIFT:
-			g_inputState.leftBuffonDown = False;
+			Core::InputStateData::Instance()->leftShiftDown = False;
 			break;
 		}
 		break;
 	case WM_RBUTTONDOWN:
-		g_inputState.rightBuffonDown = True;
+		Core::InputStateData::Instance()->rightBuffonDown = True;
+		Core::InputStateData::Instance()->xPos = LOWORD(lParam);
+		Core::InputStateData::Instance()->yPos = HIWORD(lParam);
+		Core::InputStateData::Instance()->xPosPrev = LOWORD(lParam);
+		Core::InputStateData::Instance()->yPosPrev = HIWORD(lParam);
 		break;
 	case WM_RBUTTONUP:
-		g_inputState.rightBuffonDown = False;
+		Core::InputStateData::Instance()->rightBuffonDown = False;
 		break;
 	case WM_MOUSEMOVE:
-		g_inputState.xPos = LOWORD(lParam);
-		g_inputState.yPos = HIWORD(lParam);
+		Core::InputStateData::Instance()->xPosPrev = Core::InputStateData::Instance()->xPos;
+		Core::InputStateData::Instance()->yPosPrev = Core::InputStateData::Instance()->yPos;
+		Core::InputStateData::Instance()->xPos = LOWORD(lParam);
+		Core::InputStateData::Instance()->yPos = HIWORD(lParam);
+		Core::InputStateData::Instance()->mouseIsMoveing = True;
 		break;
 	case WM_MOUSEWHEEL:
-		//g_inputState.zPos += (short)HIWORD(wParam);
+		Core::InputStateData::Instance()->zPos += (short)HIWORD(wParam) > 0 ? 0.3f : -0.3f;
+		Core::InputStateData::Instance()->zPos = Core::ClampToLeft(Core::InputStateData::Instance()->zPos, 0.0f);
 		break;
 	case WM_SIZE:
 		break;

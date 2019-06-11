@@ -1,5 +1,6 @@
 #pragma once
 #include "VulkanBase.h"
+#include "VulkanDescriptorSetLayout.h"
 #include VECTOR_INCLUDE_PATH
 
 namespace Core
@@ -7,10 +8,12 @@ namespace Core
 	class VulkanPipelineLayout
 	{
 	private:
+		ctd::vector<VkDescriptorSetLayout> m_descriptorSetLayouts;
 		VkPipelineLayout m_pipelineLayout;
 
 	public:
-		void Build(VkDevice device, ctd::vector<VkDescriptorSetLayout> descriptorSetLayouts);
+		void PushDescriptorSetLayout(VulkanDescriptorSetLayout descriptorSetLayout);
+		void Build(VkDevice device);
 		VkPipelineLayout GetPipelineLayoutHandle();
 	};
 }

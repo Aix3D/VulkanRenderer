@@ -44,6 +44,12 @@
     <Filter Include="Source\Assets">
       <UniqueIdentifier>{9967f6af-3498-4d91-b0ca-d92fcafe337c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Framework">
+      <UniqueIdentifier>{64939c53-507b-46cb-b449-2b798a828679}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\System">
+      <UniqueIdentifier>{fa6d7ab0-d9e1-4cff-8430-e67e3fef5fbf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -91,9 +97,6 @@
     <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanDevice.h">
       <Filter>Source\RHI\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\Object\Camera.h">
-      <Filter>Source\Object</Filter>
-    </ClInclude>
     <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanBase.h">
       <Filter>Source\RHI\Vulkan</Filter>
     </ClInclude>
@@ -106,12 +109,6 @@
     <ClInclude Include="..\Source\Helper\AssetManager.h">
       <Filter>Source\Helper</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\Component\StaticMesh.h">
-      <Filter>Source\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanBuffer.h">
-      <Filter>Source\RHI\Vulkan</Filter>
-    </ClInclude>
     <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanCommand.h">
       <Filter>Source\RHI\Vulkan</Filter>
     </ClInclude>
@@ -120,18 +117,6 @@
     </ClInclude>
     <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanShaderModule.h">
       <Filter>Source\RHI\Vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanBufferP.h">
-      <Filter>Source\RHI\Vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanBufferManager.h">
-      <Filter>Source\RHI\Vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\Component\RawShader.h">
-      <Filter>Source\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\Component\Material.h">
-      <Filter>Source\Component</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanPipelineLayout.h">
       <Filter>Source\RHI\Vulkan</Filter>
@@ -154,9 +139,6 @@
     <ClInclude Include="..\Source\DesignPattern\Singleton.h">
       <Filter>Source\DesignPattern\Singleton</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\Asset\VulkanTexture.h">
-      <Filter>Source\Assets</Filter>
-    </ClInclude>
     <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanDescriptorSetLayout.h">
       <Filter>Source\RHI\Vulkan</Filter>
     </ClInclude>
@@ -165,6 +147,69 @@
     </ClInclude>
     <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanDescriptorSet.h">
       <Filter>Source\RHI\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Asset\IAsset.h">
+      <Filter>Source\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Asset\RawFBX.h">
+      <Filter>Source\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Asset\StaticMesh.h">
+      <Filter>Source\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Asset\Material.h">
+      <Filter>Source\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Asset\Shader.h">
+      <Filter>Source\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Asset\RawTexture.h">
+      <Filter>Source\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Asset\Texture.h">
+      <Filter>Source\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Component\IComponent.h">
+      <Filter>Source\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Asset\World.h">
+      <Filter>Source\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Framework\Framework.h">
+      <Filter>Source\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Asset\Entity.h">
+      <Filter>Source\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Asset\RawShader.h">
+      <Filter>Source\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\System\CameraSystem.h">
+      <Filter>Source\System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\System\ISystem.h">
+      <Filter>Source\System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\System\RenderSystem.h">
+      <Filter>Source\System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Component\CameraData.h">
+      <Filter>Source\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Component\TransformData.h">
+      <Filter>Source\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Component\RenderableEntityData.h">
+      <Filter>Source\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\RHI\VulkanRHI\VulkanBuffer.h">
+      <Filter>Source\RHI\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Component\GlobalRenderData.h">
+      <Filter>Source\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Component\InputStateData.h">
+      <Filter>Source\Component</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -192,9 +237,6 @@
     <ClCompile Include="main.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\Source\Object\Camera.cpp">
-      <Filter>Source\Object</Filter>
-    </ClCompile>
     <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanBase.cpp">
       <Filter>Source\RHI\Vulkan</Filter>
     </ClCompile>
@@ -207,12 +249,6 @@
     <ClCompile Include="..\Source\Helper\AssetManager.cpp">
       <Filter>Source\Helper</Filter>
     </ClCompile>
-    <ClCompile Include="..\Source\Component\StaticMesh.cpp">
-      <Filter>Source\Component</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanBuffer.cpp">
-      <Filter>Source\RHI\Vulkan</Filter>
-    </ClCompile>
     <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanCommand.cpp">
       <Filter>Source\RHI\Vulkan</Filter>
     </ClCompile>
@@ -221,18 +257,6 @@
     </ClCompile>
     <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanShaderModule.cpp">
       <Filter>Source\RHI\Vulkan</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanBufferP.cpp">
-      <Filter>Source\RHI\Vulkan</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanBufferManager.cpp">
-      <Filter>Source\RHI\Vulkan</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\Component\RawShader.cpp">
-      <Filter>Source\Component</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\Component\Material.cpp">
-      <Filter>Source\Component</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanPipelineLayout.cpp">
       <Filter>Source\RHI\Vulkan</Filter>
@@ -252,9 +276,6 @@
     <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanGlobal.cpp">
       <Filter>Source\RHI\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="..\Source\Asset\VulkanTexture.cpp">
-      <Filter>Source\Assets</Filter>
-    </ClCompile>
     <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanDescriptorSetLayout.cpp">
       <Filter>Source\RHI\Vulkan</Filter>
     </ClCompile>
@@ -262,6 +283,45 @@
       <Filter>Source\RHI\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanDescriptorSet.cpp">
+      <Filter>Source\RHI\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Asset\RawFBX.cpp">
+      <Filter>Source\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Asset\StaticMesh.cpp">
+      <Filter>Source\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Asset\Material.cpp">
+      <Filter>Source\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Asset\Shader.cpp">
+      <Filter>Source\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Asset\RawTexture.cpp">
+      <Filter>Source\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Asset\Texture.cpp">
+      <Filter>Source\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Asset\World.cpp">
+      <Filter>Source\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Framework\Framework.cpp">
+      <Filter>Source\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Asset\Entity.cpp">
+      <Filter>Source\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Asset\RawShader.cpp">
+      <Filter>Source\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\System\CameraSystem.cpp">
+      <Filter>Source\System</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\System\RenderSystem.cpp">
+      <Filter>Source\System</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\RHI\VulkanRHI\VulkanBuffer.cpp">
       <Filter>Source\RHI\Vulkan</Filter>
     </ClCompile>
   </ItemGroup>
